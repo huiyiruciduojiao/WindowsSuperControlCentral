@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Super Console</title>
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <style>
+        div {
+            border: 1px solid black;
+        }
+
+        P {
+            margin: 0px;
+            border: 0px;
+            padding: 0px;
+        }
+
+        select {
+            height: 4vh;
+        }
+
+        #terminal {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        #output,
+        #output > p {
+            display: inline;
+        }
+
+        #input {
+            width: 100%;
+            color: #00FF00;
+            border: none;
+            outline: none;
+            display: inline-block;
+        }
+    </style>
+    <style>
+        #taskList {
+            height: 100%;
+            overflow-y: auto;
+            text-align: left;
+            padding: 0px;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 0.4em;
+            height: 1em;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            /* 表头固定在顶部 */
+            position: sticky;
+            top: 0;
+            cursor: pointer;
+        }
+
+            th.asc:after {
+                content: '▼';
+            }
+
+            th.desc:after {
+                content: '▲';
+            }
+
+        tr:hover {
+            background-color: #cdefff;
+        }
+
+        .liSelect {
+            background-color: #C3EBFF;
+        }
+
+        #menus {
+            width: 140px;
+            padding: 3px 5px;
+            background-color: #ffffff;
+            display: none;
+            /* display: flex; */
+            flex-wrap: wrap;
+            border: 1px solid #dadce0;
+            border-radius: 2px;
+            box-shadow: 1px 1px 2px #878787;
+            position: fixed;
+            user-select: none;
+        }
+
+            #menus div {
+                display: flex;
+                align-items: center;
+                margin: 2px 0px;
+                cursor: pointer;
+                width: 100%;
+                min-height: 26px;
+                padding: 0px 8px;
+                font-size: 14px;
+            }
+
+                #menus div:hover {
+                    background-color: #C3EBFF;
+                }
+    </style>
+
+</head>
+
+<body>
+    <div class="container-fluid text-center">
+        <div class="row">
+            <div class="col-3">
+                <div class="row" style="height: 33.3vh;">
+                    <!-- <p>欢迎使用 Windows super console 模拟终端</p> -->
+                    <h1>CPU状态</h1>
+                    <canvas id="cpuCanvas" style="width: 100%; height:75%;"></canvas>
+                </div>
+                <div class="row" style="height: 33.3vh;">
+                    <h1>内存状态</h1>
+                </div>
+                <div class="row" style="height: 33.1vh;">
+                    <!-- <h1 style="padding: 0px; margin:0px;">网络状态</h1> -->
+                    <select name="networkSelect" id="networkSelect" class="form-select"
+                            onchange="NetWorkDriveSelectChange(this);">
+                    </select>
+                    <div id="upnetwork" style="height: 70%; width: 50%;">
+                        <p>上传速度</p>
+                    </div>
+                    <div id="downnetwork" style="height: 70%; width: 50%;">
+                        <p>下载速度</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row" style="height: 10vh;">
+                    <h1>Windows Super Console</h1>
+                    <p>欢迎使用 Windows super console</p>
+                </div>
+                <div class="row " style="height:56.6vh; text-align: left; ">
+                    <!-- <p>欢迎使用 Windows super console 模拟终端</p> -->
+                    <div id="terminal">
+                        <pre id="output"></pre>
+                        <input id="input" type="text" autofocus>
+                    </div>
+                </div>
+                <div class="row" style="height: 33.1vh;">
+                    <!-- <h1>进程状态</h1> -->
+                    <div id="taskList">
+                        <table id="taskView">
+                            <thead>
+                                <tr>
+                                    <th data-column="Name">名称</th>
+                                    <th data-column="ImageName">镜像名称</th>
+                                    <th data-column="ImagePath">镜像路径</th>
+                                    <th data-column="UserName">启动用户名</th>
+                                    <th data-column="Id">Id</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="menus">
+                        <div data-id="killtask">结束任务</div>
+                        <div data-id="open">打开文件夹</div>
+                        <div data-id="attribute">属性</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="row" style="height: 49.9vh;">
+                    <h1>磁盘状态</h1>
+                    <label for="diskSelect" class="form-label">请选择一个磁盘</label>
+                    <select name="" id="diskSelect" class="form-select" onchange="DiskDriveSelectChange(this);">
+                    </select>
+                    <div id="DiskOutputChart" style="height: 50%; width:50%;">
+                        <p>读取速度</p>
+                    </div>
+                    <div id="DiskInputChart" style="height: 50%; width:50%;">
+                        <p>写入速度</p>
+                    </div>
+                    <div>
+                        <p>磁盘空间</p>
+                    </div>
+
+
+                </div>
+                <div class="row" style="height: 49.9vh;   position: relative;">
+                    <!-- <h1>网络状态</h1> -->
+                    <p>系统扬声器音量</p>
+                    <div style="height: 60%; width: auto; margin: auto; margin-right: 0em; padding: 0px;">
+
+                        <input type="range" id="volume" value="" min="0" max="100" step="1" oninput="changeVolume(this)"
+                               style=" appearance: slider-vertical; height: 100%;">
+                        <p id="volumeView">10</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <script src="/js/echarts.min.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script src="/js/dataQueue.js"></script>
+    <script>
+        class Chart {
+            constructor(element, unit, value) {
+                this.element = element;
+                this.unit = unit;
+                this.value = value;
+            }
+            draw() {
+                this.myChart = echarts.init(this.element, null, {
+                    renderer: 'svg',
+                    useDirtyRect: false
+                });
+                var app = {};
+
+                var option;
+
+                option = {
+                    series: [
+                        {
+                            type: 'gauge',
+                            axisLine: {
+                                lineStyle: {
+                                    width: 5,
+                                    color: [
+                                        [0.3, '#67e0e3'],
+                                        [0.7, '#37a2da'],
+                                        [1, '#fd666d']
+                                    ]
+                                }
+                            },
+                            pointer: {
+                                itemStyle: {
+                                    color: 'auto'
+                                }
+                            },
+                            axisTick: {
+                                distance: -30,
+                                length: 10,
+                                lineStyle: {
+                                    color: '#fff',
+                                    width: 0
+                                }
+                            },
+                            splitLine: {
+                                distance: -30,
+                                length: 30,
+                                lineStyle: {
+                                    color: '#fff',
+                                    width: 2
+                                }
+                            },
+                            axisLabel: {
+                                color: 'inherit',
+                                distance: 6,
+                                fontSize: 8
+                            },
+                            detail: {
+                                valueAnimation: true,
+                                formatter: '{value} ' + this.unit,
+                                color: 'inherit',
+                                fontSize: "1em"
+                            },
+                            data: [
+                                {
+                                    value: this.value
+                                }
+                            ]
+                        }
+                    ]
+                };
+                if (option && typeof option === 'object') {
+                    this.myChart.setOption(option);
+                }
+
+                window.addEventListener('resize', this.myChart.resize);
+            }
+            setvalue(value, unit = "MB/S") {
+                this.unit = unit;
+                this.myChart.setOption({
+                    series: [
+                        {
+                            detail: {
+
+                                formatter: '{value} ' + this.unit,
+
+                            },
+                            data: [
+                                {
+                                    value: value
+                                }
+                            ]
+                        }
+                    ]
+                });
+            }
+        }
+        // 网络状态
+        var NetUpLoadChart = new Chart(document.getElementById("upnetwork"), "KB/s", 0);
+        var NetDownChart = new Chart(document.getElementById("downnetwork"), "KB/s", 0);
+
+        // 磁盘图表
+        var DiskInputChart = new Chart(document.getElementById("DiskInputChart"), "KB/s", 0);
+        var DiskOutputChart = new Chart(document.getElementById("DiskOutputChart"), "KB/s", 0);
+
+        DiskInputChart.draw();
+        DiskOutputChart.draw();
+
+        NetUpLoadChart.draw();
+        NetDownChart.draw();
+        function changeVolume(element) {
+            document.getElementById("volumeView").innerText = element.value;
+
+            PostServerVolume(element.value);
+        }
+        function setVolumeValue(value) {
+            let volume = document.getElementById("volume");
+            volume.value = value;
+            changeVolume(volume);
+        }
+        function PostServerVolume(value) {
+            formium.postMessage("changeVolume", value);
+        }
+        let commandViewDataElement = document.getElementById("input");
+        commandViewDataElement.addEventListener('keyup', function (event) {
+            if (event.key === 'Enter') {
+                const inputText = commandViewDataElement.value;
+                commandViewDataElement.value = '';
+                PostServerCommand(inputText);
+            }
+        });
+        const outputElement = document.getElementById('output');
+        const inputElement = document.getElementById('input');
+        const containerElement = document.getElementById('terminal');
+        let textNode = document.createTextNode(" ");
+        containerElement.addEventListener("click", function (event) {
+            const selectedText = window.getSelection().toString();
+            if (!selectedText) {
+                inputElement.focus();
+            } else {
+                event.stopPropagation();
+            }
+        });
+        function upInput() {
+            const lastTextNode = getLastTextNode(outputElement);
+            if (lastTextNode) {
+                lastTextNode.parentNode.appendChild(textNode);
+            } else {
+                outputElement.appendChild(textNode);
+            }
+            const range = document.createRange();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, 0);
+            const rect = range.getBoundingClientRect();
+
+            const containerRect = containerElement.getBoundingClientRect();
+
+            const x = rect.x - containerRect.x;
+            const y = rect.y - containerRect.y;
+
+            const width = containerRect.width - x - 40;
+
+            inputElement.style.width = `${width}px`;
+
+            textNode.remove();
+        }
+        function getLastTextNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                return node;
+            }
+            const children = node.childNodes;
+            for (let i = children.length - 1; i >= 0; i--) {
+                const child = children[i];
+                const reslut = getLastTextNode(child);
+                if (reslut) {
+                    return reslut;
+                }
+            }
+            return null;
+        }
+        //发送命令到C#执行
+        function PostServerCommand(command) {
+            if (command == "cls" || command == "clear") {
+                outputElement.innerHTML = "";
+            }
+            formium.postMessage("executorCommand", command);
+        }
+        formium.addMessageDispatcher("commandDataUp", (data) => {
+            let fragment = document.createDocumentFragment();
+            for (let i = 0; i < data.length; i++) {
+                let p = document.createElement("p");
+                if (data[i].newData) {
+                    outputElement.innerHTML = "";
+                }
+                if (data[i].status) {
+                    p.style.color = "red";
+                }
+                p.innerText = data[i].data;
+                fragment.append(p);
+            }
+            SetCommandDataViewValue(fragment);
+        });
+        //设置终端数据
+        function SetCommandDataViewValue(fragment) {
+            if (fragment != null) {
+                outputElement.append(fragment);
+            }
+
+            // 滚动到底部
+            upInput();
+            containerElement.scrollTop = terminal.scrollHeight;
+
+        }
+
+    </script>
+    <!-- cpu状态绘制-->
+    <script>
+        var queue = new dataQueue();
+        var canvas = document.getElementById("cpuCanvas");
+        canvas.width = canvas.clientWidth * devicePixelRatio;
+        canvas.height = canvas.clientHeight * devicePixelRatio;
+        var ctx = canvas.getContext("2d");
+        function drawLineChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.fillStyle = 'blue'
+
+            let value = queue.getAll();
+            for (let i = 0; i < value.length; i++) {
+                ctx.lineTo(ConvertIndexToX(value.length, value.length - 1 - i), PercentageToY(value[i]));
+                if (value.length - 1 - i == 0) {
+                    ctx.lineTo(canvas.clientWidth * devicePixelRatio, canvas.clientHeight * devicePixelRatio);
+                    ctx.lineTo(ConvertIndexToX(value.length, i + 1), canvas.clientHeight * devicePixelRatio);
+                    ctx.fill();
+                }
+            }
+            ctx.stroke();
+        }
+        // 将一个百分比转化为y
+        function PercentageToY(percentage) {
+            const canvasHeight = canvas.clientHeight;
+            const y = (canvasHeight - ((canvasHeight / 100) * percentage)) * devicePixelRatio;
+            return y;
+        }
+        //将数据索引位置转化为X值
+        function ConvertIndexToX(accuracy, index) {
+            const canvasWidth = canvas.clientWidth;
+            let x = ((canvasWidth / accuracy) * index) * devicePixelRatio;
+            //反转X轴
+            x = canvasWidth * devicePixelRatio - x;
+            return x;
+        }
+        //监听窗体大小改变事件
+        window.onresize = function () {
+            canvas.width = canvas.clientWidth * devicePixelRatio;
+            canvas.height = canvas.clientHeight * devicePixelRatio;
+        }
+        function pushData(data, accuracy) {
+            if (queue.size() == accuracy) {
+                queue.dequeue();
+            }
+            queue.push(data);
+            drawLineChart();
+        }
+    </script>
+
+    <!--网络设备和磁盘设备处理-->
+    <script>
+        var diskSelect = document.getElementById("diskSelect");
+        var netWorkSelect = document.getElementById("networkSelect");
+        formium.addMessageDispatcher("setDiskAndNetWorkData", (data) => {
+
+            let diskNames = data.DiskDriveName;
+            let netWorkDrive = data.NetWorkDrivename;
+
+            diskSelect.innerHTML = "";
+            netWorkSelect.innerHTML = "";
+
+            //创建文档节点
+            let diskNamefragment = document.createDocumentFragment();
+            for (let i = 0; i < diskNames.length; i++) {
+                let diskNameOption = document.createElement("option");
+                diskNameOption.value = diskNames[i];
+                diskNameOption.innerText = diskNames[i];
+                if (diskNames[i] == data.SelectDiskDriveName) {
+                    diskNameOption.selected = true;
+                }
+                diskNamefragment.append(diskNameOption);
+            }
+            diskSelect.append(diskNamefragment);
+
+            let netWorkNamefragment = document.createDocumentFragment();
+            for (let i = 0; i < netWorkDrive.length; i++) {
+                let netWorkNameOption = document.createElement("option");
+                netWorkNameOption.value = netWorkDrive[i];
+                netWorkNameOption.innerText = netWorkDrive[i];
+                if (netWorkDrive[i] == data.SelectNetWorkDriveName) {
+                    netWorkNameOption.selected = true;
+                }
+                netWorkNamefragment.append(netWorkNameOption);
+            }
+            netWorkSelect.append(netWorkNamefragment);
+
+        });
+        //磁盘设备选中改变
+        function DiskDriveSelectChange(value) {
+            formium.postMessage("changeDiskSelect", value.value);
+        }
+        //网络设备选中改变
+        function NetWorkDriveSelectChange(value) {
+            formium.postMessage("changeNetWorkSelect", value.value);
+        }
+    </script>
+    <!-- 任务列表事件处理 -->
+    <script>
+        var elementUl = document.getElementById("taskView");
+        //数据更新处理
+        function updata() {
+            elementUl.innerHTML = "";
+            var temp = document.createDocumentFragment();
+            for (var i = 0; i < Math.round(Math.random(10) * 150); i++) {
+                var templi = document.createElement("li");
+                templi.innerText = i;
+                temp.append(templi);
+            }
+            elementUl.append(temp);
+        }
+        //注册事件，获取来自C#端的数据内容，并处理，加载到页面中
+        formium.addMessageDispatcher("setTaskData", (data) => {
+            //解析data数据
+            let TaskData = data.Data;
+            SetTaskDataToView(TaskData);
+
+           
+        });
+        function SetTaskDataToView(AddTask) {
+            elementUl.getElementsByTagName("tbody")[0].innerHTML = "";
+            //创建文档片段
+            let docmentFragment = document.createDocumentFragment();
+            for (let i = 0; i < AddTask.length; i++) {
+                //一行内容
+                let tr = document.createElement("tr");
+                tr.id = "TaskId" + AddTask[i].Id;
+                //名字
+                let nameTr = document.createElement("td");
+                nameTr.innerText = AddTask[i].Name;
+                //映像文件名
+                let ImageFileName = document.createElement("td");
+                ImageFileName.innerText = AddTask[i].ImageName;
+                //映像文件路径
+                let ImageFilePath = document.createElement("td");
+                ImageFilePath.innerText = AddTask[i].ImageFilePath;
+                //进程启动用户
+                let ProcessStartUserName = document.createElement("td");
+                ProcessStartUserName.innerText = AddTask[i].UserName;
+                //进程Id
+                let ProcessId = document.createElement("td");
+                ProcessId.innerText = AddTask[i].Id;
+                tr.append(nameTr);
+                tr.append(ImageFileName);
+                tr.append(ImageFilePath);
+                tr.append(ProcessStartUserName);
+                tr.append(ProcessId);
+                docmentFragment.append(tr);
+            }
+            elementUl.getElementsByTagName("tbody")[0].append(docmentFragment);
+        }
+        function RemoveTaskDataToView(RemoveTask) {
+            for (let i = 0; i < RemoveTask.length; i++) {
+                //获取对应Id
+                const id = RemoveTask[i].Id;
+                document.getElementById("TaskId" + id).remove();
+            }
+        }
+        const menus = document.getElementById("menus");
+        var selectElement = null;
+        elementUl.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            if (selectElement != null) {
+                selectElement.classList.remove("liSelect");
+            }
+            selectElement = e.target.parentNode;
+            selectElement.classList.add("liSelect");
+            showMenu(e);
+        });
+        document.addEventListener("click", hideMenu, false); // 隐藏菜单
+        function showMenu(e) {
+            menus.style.top = `${e.clientY}px`;
+            menus.style.left = `${e.clientX}px`;
+            menus.style.display = "flex";
+        }
+        function hideMenu() {
+            selectElement.classList.remove("liSelect");
+            menus.style.display = "none";
+        }
+        const menusChild = document.querySelectorAll("#menus div");
+        menusChild.forEach(item => {
+            item.onclick = (e) => {
+                console.log(e.target.dataset.id, '元素');
+                const selectElementId = parseInt(selectElement.id.replace(/[^\d]/g, ""));
+                formium.postMessage(e.target.dataset.id, selectElementId);
+                hideMenu()
+            }
+        });
+
+        //注册点击事件，绑定表头，排序
+        const headers = elementUl.getElementsByTagName("th");
+        for (const header of headers) {
+            header.addEventListener("click", function () {
+                //点后的排序样式
+                const sort = header.classList.contains("desc") ? "asc" : "desc";
+                //移除所有表格头排序样式
+                for (h of headers) {
+                    h.classList.remove("asc");
+                    h.classList.remove("desc");
+                }
+                //设置当前点击表头的样式
+                header.classList.add(sort);
+                //发送排序请求到C#端，排序
+                formium.postMessage("TaskSort", { "sortcolumn": header.getAttribute("data-column"), "sortorder": sort });
+
+            });
+        }
+
+    </script>
+</body>
+
+</html>

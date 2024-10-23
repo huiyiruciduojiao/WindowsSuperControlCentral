@@ -1,0 +1,2995 @@
+<!DOCTYPE html>
+<html lang="zh_cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windows Super Console</title>
+    <link rel="stylesheet" href="/css/bootstrap.css">
+    <style>
+        div {
+            border: 1px solid black;
+        }
+
+        P {
+            margin: 0px;
+            border: 0px;
+            padding: 0px;
+        }
+
+        select {
+            height: 4vh;
+        }
+
+        #terminal {
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        #output,
+        #output>p {
+            display: inline;
+        }
+
+        #input {
+            width: 100%;
+            color: #00FF00;
+            border: none;
+            outline: none;
+            display: inline-block;
+        }
+    </style>
+    <style>
+        #taskList {
+            height: 100%;
+            overflow-y: auto;
+            text-align: left;
+            padding: 0px;
+        }
+
+        table {
+            border-collapse: collapse;
+            table-layout: fixed;
+            width: 100%;
+        }
+
+        th,
+        td {
+            border: 1px solid #dddddd;
+            text-align: left;
+            padding: 0.4em;
+            height: 1em;
+            white-space: nowrap;
+            text-overflow: ellipsis;
+            overflow: hidden;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            position: sticky;
+            top: 0;
+            /* 表头固定在顶部 */
+        }
+
+        tr:hover {
+            background-color: #f5f5f5;
+        }
+
+        .liSelect {
+            background-color: #C3EBFF;
+        }
+
+        #menus {
+            width: 140px;
+            padding: 3px 5px;
+            background-color: #ffffff;
+            display: none;
+            /* display: flex; */
+            flex-wrap: wrap;
+            border: 1px solid #dadce0;
+            border-radius: 2px;
+            box-shadow: 1px 1px 2px #878787;
+            position: fixed;
+            user-select: none;
+        }
+
+        #menus div {
+            display: flex;
+            align-items: center;
+            margin: 2px 0px;
+            cursor: pointer;
+            width: 100%;
+            min-height: 26px;
+            padding: 0px 8px;
+            font-size: 14px;
+        }
+
+        #menus div:hover {
+            background-color: #C3EBFF;
+        }
+    </style>
+
+</head>
+
+<body>
+    <div class="container-fluid text-center">
+        <div class="row">
+            <div class="col-3">
+                <div class="row" style="height: 33.3vh;">
+                    <!-- <p>欢迎使用 Windows super console 模拟终端</p> -->
+                    <h1>CPU状态</h1>
+                    <canvas id="cpuCanvas" style="width: 100%; height:75%;"></canvas>
+                </div>
+                <div class="row" style="height: 33.3vh;">
+                    <h1>内存状态</h1>
+                </div>
+                <div class="row" style="height: 33.1vh;">
+                    <!-- <h1 style="padding: 0px; margin:0px;">网络状态</h1> -->
+                    <select name="networkSelect" id="networkSelect" class="form-select"
+                        onchange="NetWorkDriveSelectChange(this);">
+                    </select>
+                    <div id="upnetwork" style="height: 70%; width: 50%;">
+                        <p>上传速度</p>
+                    </div>
+                    <div id="downnetwork" style="height: 70%; width: 50%;">
+                        <p>下载速度</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-6">
+                <div class="row" style="height: 10vh;">
+                    <h1>Windows Super Console</h1>
+                    <p>欢迎使用 Windows super console</p>
+                </div>
+                <div class="row " style="height:56.6vh; text-align: left; ">
+                    <!-- <p>欢迎使用 Windows super console 模拟终端</p> -->
+                    <div id="terminal">
+                        <pre id="output"></pre>
+                        <input id="input" type="text" autofocus>
+                    </div>
+                </div>
+                <div class="row" style="height: 33.1vh;">
+                    <!-- <h1>进程状态</h1> -->
+                    <div id="taskList">
+                        <table id="taskView">
+                            <thead>
+                                <tr>
+                                    <th>名称</th>
+                                    <th>镜像名称</th>
+                                    <th>镜像路径</th>
+                                    <th>启动用户名</th>
+                                    <th>Id</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr id="TaskId0">
+                                    <td>Idle</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>0</td>
+                                </tr>
+                                <tr id="TaskId4">
+                                    <td>System</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>4</td>
+                                </tr>
+                                <tr id="TaskId172">
+                                    <td>Registry</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>172</td>
+                                </tr>
+                                <tr id="TaskId612">
+                                    <td>smss</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>612</td>
+                                </tr>
+                                <tr id="TaskId872">
+                                    <td>csrss</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>872</td>
+                                </tr>
+                                <tr id="TaskId1000">
+                                    <td>wininit</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>1000</td>
+                                </tr>
+                                <tr id="TaskId1016">
+                                    <td>csrss</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>1016</td>
+                                </tr>
+                                <tr id="TaskId908">
+                                    <td>services</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>908</td>
+                                </tr>
+                                <tr id="TaskId912">
+                                    <td>lsass</td>
+                                    <td>lsass.exe</td>
+                                    <td>C:\Windows\System32\lsass.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>912</td>
+                                </tr>
+                                <tr id="TaskId1080">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>1080</td>
+                                </tr>
+                                <tr id="TaskId1108">
+                                    <td>fontdrvhost</td>
+                                    <td>fontdrvhost.exe</td>
+                                    <td>C:\Windows\System32\fontdrvhost.exe</td>
+                                    <td>Font Driver Host\UMFD-0</td>
+                                    <td>1108</td>
+                                </tr>
+                                <tr id="TaskId1144">
+                                    <td>WUDFHost</td>
+                                    <td>WUDFHost.exe</td>
+                                    <td>C:\Windows\System32\WUDFHost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1144</td>
+                                </tr>
+                                <tr id="TaskId1240" style="
+    height: 10px;
+">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>1240</td>
+                                </tr>
+                                <tr id="TaskId1296">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>1296</td>
+                                </tr>
+                                <tr id="TaskId1364">
+                                    <td>winlogon</td>
+                                    <td>winlogon.exe</td>
+                                    <td>C:\Windows\System32\winlogon.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>1364</td>
+                                </tr>
+                                <tr id="TaskId1452">
+                                    <td>fontdrvhost</td>
+                                    <td>fontdrvhost.exe</td>
+                                    <td>C:\Windows\System32\fontdrvhost.exe</td>
+                                    <td>Font Driver Host\UMFD-1</td>
+                                    <td>1452</td>
+                                </tr>
+                                <tr id="TaskId1528">
+                                    <td>dwm</td>
+                                    <td>dwm.exe</td>
+                                    <td>C:\Windows\System32\dwm.exe</td>
+                                    <td>Window Manager\DWM-1</td>
+                                    <td>1528</td>
+                                </tr>
+                                <tr id="TaskId1616">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>1616</td>
+                                </tr>
+                                <tr id="TaskId1636">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1636</td>
+                                </tr>
+                                <tr id="TaskId1648">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1648</td>
+                                </tr>
+                                <tr id="TaskId1656">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1656</td>
+                                </tr>
+                                <tr id="TaskId1680">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1680</td>
+                                </tr>
+                                <tr id="TaskId1820">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1820</td>
+                                </tr>
+                                <tr id="TaskId1936">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>1936</td>
+                                </tr>
+                                <tr id="TaskId1944">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1944</td>
+                                </tr>
+                                <tr id="TaskId2032">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>2032</td>
+                                </tr>
+                                <tr id="TaskId2040">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>2040</td>
+                                </tr>
+                                <tr id="TaskId1028">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1028</td>
+                                </tr>
+                                <tr id="TaskId1100">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>1100</td>
+                                </tr>
+                                <tr id="TaskId2052">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>2052</td>
+                                </tr>
+                                <tr id="TaskId2144">
+                                    <td>IntelCpHDCPSvc</td>
+                                    <td>IntelCpHDCPSvc.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\iigd_dch.inf_amd64_faf3bcecf744f99a\IntelCpHDCPSvc.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>2144</td>
+                                </tr>
+                                <tr id="TaskId2160">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>2160</td>
+                                </tr>
+                                <tr id="TaskId2168">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>2168</td>
+                                </tr>
+                                <tr id="TaskId2240">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>2240</td>
+                                </tr>
+                                <tr id="TaskId2284">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>2284</td>
+                                </tr>
+                                <tr id="TaskId2404">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>2404</td>
+                                </tr>
+                                <tr id="TaskId2412">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>2412</td>
+                                </tr>
+                                <tr id="TaskId2708">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>2708</td>
+                                </tr>
+                                <tr id="TaskId2768">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>2768</td>
+                                </tr>
+                                <tr id="TaskId2912">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>2912</td>
+                                </tr>
+                                <tr id="TaskId2928">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>2928</td>
+                                </tr>
+                                <tr id="TaskId2936">
+                                    <td>igfxCUIServiceN</td>
+                                    <td>igfxCUIServiceN.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\cui_dch.inf_amd64_6673c5322430fc8a\igfxCUIServiceN.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>2936</td>
+                                </tr>
+                                <tr id="TaskId3016">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3016</td>
+                                </tr>
+                                <tr id="TaskId3128">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3128</td>
+                                </tr>
+                                <tr id="TaskId3160">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>3160</td>
+                                </tr>
+                                <tr id="TaskId3260">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3260</td>
+                                </tr>
+                                <tr id="TaskId3268">
+                                    <td>WUDFHost</td>
+                                    <td>WUDFHost.exe</td>
+                                    <td>C:\Windows\System32\WUDFHost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>3268</td>
+                                </tr>
+                                <tr id="TaskId3368">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3368</td>
+                                </tr>
+                                <tr id="TaskId3516">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3516</td>
+                                </tr>
+                                <tr id="TaskId3588">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>3588</td>
+                                </tr>
+                                <tr id="TaskId3680">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3680</td>
+                                </tr>
+                                <tr id="TaskId3892">
+                                    <td>dasHost</td>
+                                    <td>dasHost.exe</td>
+                                    <td>C:\Windows\System32\dasHost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>3892</td>
+                                </tr>
+                                <tr id="TaskId3940">
+                                    <td>NVDisplay.Container</td>
+                                    <td>NVDisplay.Container.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\nvtfui.inf_amd64_0b17f3cb5f1d4306\Display.NvContainer\NVDisplay.Container.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3940</td>
+                                </tr>
+                                <tr id="TaskId4052">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>4052</td>
+                                </tr>
+                                <tr id="TaskId4048">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>4048</td>
+                                </tr>
+                                <tr id="TaskId3460">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3460</td>
+                                </tr>
+                                <tr id="TaskId3424">
+                                    <td>Memory Compression</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>3424</td>
+                                </tr>
+                                <tr id="TaskId3428">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>3428</td>
+                                </tr>
+                                <tr id="TaskId4136">
+                                    <td>NVDisplay.Container</td>
+                                    <td>NVDisplay.Container.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\nvtfui.inf_amd64_0b17f3cb5f1d4306\Display.NvContainer\NVDisplay.Container.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>4136</td>
+                                </tr>
+                                <tr id="TaskId4152">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>4152</td>
+                                </tr>
+                                <tr id="TaskId4636">
+                                    <td>WmiPrvSE</td>
+                                    <td>WmiPrvSE.exe</td>
+                                    <td>C:\Windows\System32\wbem\WmiPrvSE.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>4636</td>
+                                </tr>
+                                <tr id="TaskId4684">
+                                    <td>wsctrlsvc</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>4684</td>
+                                </tr>
+                                <tr id="TaskId4716">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>4716</td>
+                                </tr>
+                                <tr id="TaskId5012">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>5012</td>
+                                </tr>
+                                <tr id="TaskId5152">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>5152</td>
+                                </tr>
+                                <tr id="TaskId5200">
+                                    <td>WmiPrvSE</td>
+                                    <td>WmiPrvSE.exe</td>
+                                    <td>C:\Windows\System32\wbem\WmiPrvSE.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>5200</td>
+                                </tr>
+                                <tr id="TaskId5340">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>5340</td>
+                                </tr>
+                                <tr id="TaskId5388">
+                                    <td>audiodg</td>
+                                    <td>audiodg.exe</td>
+                                    <td>C:\Windows\System32\audiodg.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>5388</td>
+                                </tr>
+                                <tr id="TaskId5408">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>5408</td>
+                                </tr>
+                                <tr id="TaskId5484">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>5484</td>
+                                </tr>
+                                <tr id="TaskId5572">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>5572</td>
+                                </tr>
+                                <tr id="TaskId5652">
+                                    <td>wlanext</td>
+                                    <td>wlanext.exe</td>
+                                    <td>C:\Windows\System32\wlanext.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>5652</td>
+                                </tr>
+                                <tr id="TaskId5680">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>5680</td>
+                                </tr>
+                                <tr id="TaskId5688">
+                                    <td>spoolsv</td>
+                                    <td>spoolsv.exe</td>
+                                    <td>C:\Windows\System32\spoolsv.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>5688</td>
+                                </tr>
+                                <tr id="TaskId5776">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>5776</td>
+                                </tr>
+                                <tr id="TaskId6080">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>6080</td>
+                                </tr>
+                                <tr id="TaskId3464">
+                                    <td>OfficeClickToRun</td>
+                                    <td>OfficeClickToRun.exe</td>
+                                    <td>C:\Program Files\Common Files\microsoft shared\ClickToRun\OfficeClickToRun.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>3464</td>
+                                </tr>
+                                <tr id="TaskId6152">
+                                    <td>gameinputsvc</td>
+                                    <td>gameinputsvc.exe</td>
+                                    <td>C:\Program Files (x86)\Microsoft GameInput\x64\gameinputsvc.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6152</td>
+                                </tr>
+                                <tr id="TaskId6160">
+                                    <td>GCUBridge</td>
+                                    <td>GCUBridge.exe</td>
+                                    <td>C:\Program Files\OEM\机械革命电竞控制台\UniwillService\GCUBridge.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6160</td>
+                                </tr>
+                                <tr id="TaskId6168">
+                                    <td>OneApp.IGCC.WinService</td>
+                                    <td>OneApp.IGCC.WinService.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\igcc_dch.inf_amd64_a687edda40db3316\OneApp.IGCC.WinService.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6168</td>
+                                </tr>
+                                <tr id="TaskId6176">
+                                    <td>FNPLicensingService</td>
+                                    <td>FNPLicensingService.exe</td>
+                                    <td>C:\Program Files (x86)\Common Files\Macrovision Shared\FlexNet
+                                        Publisher\FNPLicensingService.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6176</td>
+                                </tr>
+                                <tr id="TaskId6184">
+                                    <td>RtkAudUService64</td>
+                                    <td>RtkAudUService64.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\realtekservice.inf_amd64_18c775e07a6aaafd\RtkAudUService64.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6184</td>
+                                </tr>
+                                <tr id="TaskId6200">
+                                    <td>phpStudyServer</td>
+                                    <td>phpStudyServer.exe</td>
+                                    <td>D:\phpstudy_pro\COM\phpStudyServer.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6200</td>
+                                </tr>
+                                <tr id="TaskId6208">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>6208</td>
+                                </tr>
+                                <tr id="TaskId6216">
+                                    <td>vmnetdhcp</td>
+                                    <td>vmnetdhcp.exe</td>
+                                    <td>C:\Windows\SysWOW64\vmnetdhcp.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6216</td>
+                                </tr>
+                                <tr id="TaskId6224">
+                                    <td>Creative.UWPRPCService</td>
+                                    <td>Creative.UWPRPCService.exe</td>
+                                    <td>C:\Windows\SysWOW64\Creative.UWPRPCService.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6224</td>
+                                </tr>
+                                <tr id="TaskId6232">
+                                    <td>sqlwriter</td>
+                                    <td>sqlwriter.exe</td>
+                                    <td>C:\Program Files\Microsoft SQL Server\90\Shared\sqlwriter.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6232</td>
+                                </tr>
+                                <tr id="TaskId6244">
+                                    <td>spacedeskService</td>
+                                    <td>spacedeskService.exe</td>
+                                    <td>C:\Windows\System32\spacedeskService.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6244</td>
+                                </tr>
+                                <tr id="TaskId6264">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\SysWOW64\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6264</td>
+                                </tr>
+                                <tr id="TaskId6272">
+                                    <td>mysqld</td>
+                                    <td>mysqld.exe</td>
+                                    <td>D:\Program Files (x86)\mysql5\bin\mysqld.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6272</td>
+                                </tr>
+                                <tr id="TaskId6280">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6280</td>
+                                </tr>
+                                <tr id="TaskId6288">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6288</td>
+                                </tr>
+                                <tr id="TaskId6300">
+                                    <td>WMIRegistrationService</td>
+                                    <td>WMIRegistrationService.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\mewmiprov.inf_amd64_cad1db73e8c782a6\WMIRegistrationService.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6300</td>
+                                </tr>
+                                <tr id="TaskId6320">
+                                    <td>kms-renewal</td>
+                                    <td>kms-renewal.exe</td>
+                                    <td>C:\Windows\System32\kms-renewal.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6320</td>
+                                </tr>
+                                <tr id="TaskId6312">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6312</td>
+                                </tr>
+                                <tr id="TaskId6328">
+                                    <td>vmware-usbarbitrator64</td>
+                                    <td>vmware-usbarbitrator64.exe</td>
+                                    <td>C:\Program Files (x86)\Common Files\VMware\USB\vmware-usbarbitrator64.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6328</td>
+                                </tr>
+                                <tr id="TaskId6336">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6336</td>
+                                </tr>
+                                <tr id="TaskId6352">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6352</td>
+                                </tr>
+                                <tr id="TaskId6384">
+                                    <td>ToDesk</td>
+                                    <td>ToDesk.exe</td>
+                                    <td>D:\Program Files (x86)\ToDesk\ToDesk.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6384</td>
+                                </tr>
+                                <tr id="TaskId6396">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>6396</td>
+                                </tr>
+                                <tr id="TaskId6404">
+                                    <td>vmware-authd</td>
+                                    <td>vmware-authd.exe</td>
+                                    <td>D:\Program Files (x86)\VMware\VMware Workstation\vmware-authd.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6404</td>
+                                </tr>
+                                <tr id="TaskId6452">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>6452</td>
+                                </tr>
+                                <tr id="TaskId6460">
+                                    <td>vmnat</td>
+                                    <td>vmnat.exe</td>
+                                    <td>C:\Windows\SysWOW64\vmnat.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6460</td>
+                                </tr>
+                                <tr id="TaskId6476">
+                                    <td>nvcontainer</td>
+                                    <td>nvcontainer.exe</td>
+                                    <td>C:\Program Files\NVIDIA Corporation\NvContainer\nvcontainer.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6476</td>
+                                </tr>
+                                <tr id="TaskId6560">
+                                    <td>gamingservices</td>
+                                    <td>gamingservices.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\Microsoft.GamingServices_16.83.11001.0_x64__8wekyb3d8bbwe\gamingservices.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6560</td>
+                                </tr>
+                                <tr id="TaskId6568">
+                                    <td>gamingservicesnet</td>
+                                    <td>gamingservicesnet.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\Microsoft.GamingServices_16.83.11001.0_x64__8wekyb3d8bbwe\gamingservicesnet.exe
+                                    </td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>6568</td>
+                                </tr>
+                                <tr id="TaskId6788">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6788</td>
+                                </tr>
+                                <tr id="TaskId6876">
+                                    <td>gameinputsvc</td>
+                                    <td>gameinputsvc.exe</td>
+                                    <td>C:\Program Files (x86)\Microsoft GameInput\x64\gameinputsvc.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6876</td>
+                                </tr>
+                                <tr id="TaskId7048">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>7048</td>
+                                </tr>
+                                <tr id="TaskId7080">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>7080</td>
+                                </tr>
+                                <tr id="TaskId7324">
+                                    <td>jhi_service</td>
+                                    <td>jhi_service.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\dal.inf_amd64_b5484efd38adbe8d\jhi_service.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>7324</td>
+                                </tr>
+                                <tr id="TaskId7756">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>7756</td>
+                                </tr>
+                                <tr id="TaskId7768">
+                                    <td>SearchIndexer</td>
+                                    <td>SearchIndexer.exe</td>
+                                    <td>C:\Windows\System32\SearchIndexer.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>7768</td>
+                                </tr>
+                                <tr id="TaskId7916">
+                                    <td>vmware-hostd</td>
+                                    <td>vmware-hostd.exe</td>
+                                    <td>D:\Program Files (x86)\VMware\VMware Workstation\vmware-hostd.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>7916</td>
+                                </tr>
+                                <tr id="TaskId8860">
+                                    <td>rundll32</td>
+                                    <td>rundll32.exe</td>
+                                    <td>C:\Windows\System32\rundll32.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>8860</td>
+                                </tr>
+                                <tr id="TaskId9516">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>9516</td>
+                                </tr>
+                                <tr id="TaskId9620">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>9620</td>
+                                </tr>
+                                <tr id="TaskId9664">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>9664</td>
+                                </tr>
+                                <tr id="TaskId3660">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>3660</td>
+                                </tr>
+                                <tr id="TaskId10312">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>10312</td>
+                                </tr>
+                                <tr id="TaskId10556">
+                                    <td>dllhost</td>
+                                    <td>dllhost.exe</td>
+                                    <td>C:\Windows\System32\dllhost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>10556</td>
+                                </tr>
+                                <tr id="TaskId2684">
+                                    <td>spacedeskServiceTray</td>
+                                    <td>spacedeskServiceTray.exe</td>
+                                    <td>C:\Windows\System32\spacedeskServiceTray.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>2684</td>
+                                </tr>
+                                <tr id="TaskId10696">
+                                    <td>nvcontainer</td>
+                                    <td>nvcontainer.exe</td>
+                                    <td>C:\Program Files\NVIDIA Corporation\NvContainer\nvcontainer.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10696</td>
+                                </tr>
+                                <tr id="TaskId3540">
+                                    <td>sihost</td>
+                                    <td>sihost.exe</td>
+                                    <td>C:\Windows\System32\sihost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>3540</td>
+                                </tr>
+                                <tr id="TaskId10880">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10880</td>
+                                </tr>
+                                <tr id="TaskId10876">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10876</td>
+                                </tr>
+                                <tr id="TaskId624">
+                                    <td>PresentationFontCache</td>
+                                    <td>PresentationFontCache.exe</td>
+                                    <td>C:\Windows\Microsoft.NET\Framework64\v3.0\WPF\PresentationFontCache.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>624</td>
+                                </tr>
+                                <tr id="TaskId9964">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>9964</td>
+                                </tr>
+                                <tr id="TaskId6744">
+                                    <td>PopBlock</td>
+                                    <td>PopBlock.exe</td>
+                                    <td>C:\Program Files (x86)\Huorong\Sysdiag\bin\PopBlock.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>6744</td>
+                                </tr>
+                                <tr id="TaskId11200">
+                                    <td>taskhostw</td>
+                                    <td>taskhostw.exe</td>
+                                    <td>C:\Windows\System32\taskhostw.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>11200</td>
+                                </tr>
+                                <tr id="TaskId1376">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>1376</td>
+                                </tr>
+                                <tr id="TaskId4180">
+                                    <td>explorer</td>
+                                    <td>explorer.exe</td>
+                                    <td>C:\Windows\explorer.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>4180</td>
+                                </tr>
+                                <tr id="TaskId4644">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>4644</td>
+                                </tr>
+                                <tr id="TaskId4652">
+                                    <td>igfxEMN</td>
+                                    <td>igfxEMN.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\cui_dch.inf_amd64_6673c5322430fc8a\igfxEMN.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>4652</td>
+                                </tr>
+                                <tr id="TaskId2764">
+                                    <td>NVIDIA Web Helper</td>
+                                    <td>NVIDIA Web Helper.exe</td>
+                                    <td>C:\Program Files (x86)\NVIDIA Corporation\NvNode\NVIDIA Web Helper.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>2764</td>
+                                </tr>
+                                <tr id="TaskId9940">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>9940</td>
+                                </tr>
+                                <tr id="TaskId10816">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10816</td>
+                                </tr>
+                                <tr id="TaskId6240">
+                                    <td>GCUService</td>
+                                    <td>GCUService.exe</td>
+                                    <td>C:\Program Files\OEM\机械革命电竞控制台\UniwillService\MyControlCenter\GCUService.exe
+                                    </td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>6240</td>
+                                </tr>
+                                <tr id="TaskId6920">
+                                    <td>StartMenuExperienceHost</td>
+                                    <td>StartMenuExperienceHost.exe</td>
+                                    <td>C:\Windows\SystemApps\Microsoft.Windows.StartMenuExperienceHost_cw5n1h2txyewy\StartMenuExperienceHost.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>6920</td>
+                                </tr>
+                                <tr id="TaskId8264">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>8264</td>
+                                </tr>
+                                <tr id="TaskId11604">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>11604</td>
+                                </tr>
+                                <tr id="TaskId11804">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>11804</td>
+                                </tr>
+                                <tr id="TaskId12240">
+                                    <td>SearchApp</td>
+                                    <td>SearchApp.exe</td>
+                                    <td>C:\Windows\SystemApps\Microsoft.Windows.Search_cw5n1h2txyewy\SearchApp.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12240</td>
+                                </tr>
+                                <tr id="TaskId12584">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12584</td>
+                                </tr>
+                                <tr id="TaskId12896">
+                                    <td>ToDesk</td>
+                                    <td>ToDesk.exe</td>
+                                    <td>D:\Program Files (x86)\ToDesk\ToDesk.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12896</td>
+                                </tr>
+                                <tr id="TaskId13844">
+                                    <td>ctfmon</td>
+                                    <td>ctfmon.exe</td>
+                                    <td>C:\Windows\System32\ctfmon.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>13844</td>
+                                </tr>
+                                <tr id="TaskId13872">
+                                    <td>TabTip</td>
+                                    <td>TabTip.exe</td>
+                                    <td>C:\Program Files\Common Files\microsoft shared\ink\TabTip.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>13872</td>
+                                </tr>
+                                <tr id="TaskId14332">
+                                    <td>ChsIME</td>
+                                    <td>ChsIME.exe</td>
+                                    <td>C:\Windows\System32\InputMethod\CHS\ChsIME.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14332</td>
+                                </tr>
+                                <tr id="TaskId13852">
+                                    <td>TextInputHost</td>
+                                    <td>TextInputHost.exe</td>
+                                    <td>C:\Windows\SystemApps\MicrosoftWindows.Client.CBS_cw5n1h2txyewy\TextInputHost.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>13852</td>
+                                </tr>
+                                <tr id="TaskId1544">
+                                    <td>PhoneExperienceHost</td>
+                                    <td>PhoneExperienceHost.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\Microsoft.YourPhone_1.23092.158.0_x64__8wekyb3d8bbwe\PhoneExperienceHost.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>1544</td>
+                                </tr>
+                                <tr id="TaskId14184">
+                                    <td>dllhost</td>
+                                    <td>dllhost.exe</td>
+                                    <td>C:\Windows\System32\dllhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14184</td>
+                                </tr>
+                                <tr id="TaskId14344">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14344</td>
+                                </tr>
+                                <tr id="TaskId14652">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14652</td>
+                                </tr>
+                                <tr id="TaskId14108">
+                                    <td>SecurityHealthSystray</td>
+                                    <td>SecurityHealthSystray.exe</td>
+                                    <td>C:\Windows\System32\SecurityHealthSystray.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14108</td>
+                                </tr>
+                                <tr id="TaskId6668">
+                                    <td>SecurityHealthService</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>6668</td>
+                                </tr>
+                                <tr id="TaskId15096">
+                                    <td>RtkAudUService64</td>
+                                    <td>RtkAudUService64.exe</td>
+                                    <td>C:\Windows\System32\DriverStore\FileRepository\realtekservice.inf_amd64_18c775e07a6aaafd\RtkAudUService64.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>15096</td>
+                                </tr>
+                                <tr id="TaskId14924">
+                                    <td>HipsTray</td>
+                                    <td>HipsTray.exe</td>
+                                    <td>C:\Program Files (x86)\Huorong\Sysdiag\bin\HipsTray.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14924</td>
+                                </tr>
+                                <tr id="TaskId13364">
+                                    <td>AudioVisualizer</td>
+                                    <td>AudioVisualizer.exe</td>
+                                    <td>D:\Program Files\MyApp\AudioVisualizer\AudioVisualizer.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>13364</td>
+                                </tr>
+                                <tr id="TaskId14508">
+                                    <td>SystemSettings</td>
+                                    <td>SystemSettings.exe</td>
+                                    <td>C:\Windows\ImmersiveControlPanel\SystemSettings.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14508</td>
+                                </tr>
+                                <tr id="TaskId15120">
+                                    <td>ApplicationFrameHost</td>
+                                    <td>ApplicationFrameHost.exe</td>
+                                    <td>C:\Windows\System32\ApplicationFrameHost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>15120</td>
+                                </tr>
+                                <tr id="TaskId15644">
+                                    <td>UserOOBEBroker</td>
+                                    <td>UserOOBEBroker.exe</td>
+                                    <td>C:\Windows\System32\oobe\UserOOBEBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>15644</td>
+                                </tr>
+                                <tr id="TaskId15744">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>15744</td>
+                                </tr>
+                                <tr id="TaskId15912">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>15912</td>
+                                </tr>
+                                <tr id="TaskId15972">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>15972</td>
+                                </tr>
+                                <tr id="TaskId16020">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16020</td>
+                                </tr>
+                                <tr id="TaskId16096">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16096</td>
+                                </tr>
+                                <tr id="TaskId16116">
+                                    <td>CastSrv</td>
+                                    <td>CastSrv.exe</td>
+                                    <td>C:\Windows\System32\CastSrv.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16116</td>
+                                </tr>
+                                <tr id="TaskId14548">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>14548</td>
+                                </tr>
+                                <tr id="TaskId16448">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>16448</td>
+                                </tr>
+                                <tr id="TaskId10944">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>10944</td>
+                                </tr>
+                                <tr id="TaskId16564">
+                                    <td>SystrayComponent</td>
+                                    <td>SystrayComponent.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\ControlCenter3_3.17.42.0_x64__qg9e98r30y5x0\Win32\SystrayComponent.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16564</td>
+                                </tr>
+                                <tr id="TaskId16352">
+                                    <td>IGCCTray</td>
+                                    <td>IGCCTray.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\AppUp.IntelGraphicsExperience_1.100.5237.0_x64__8j3eq9eme6ctt\GCP.ML.BackgroundSysTray\IGCCTray.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16352</td>
+                                </tr>
+                                <tr id="TaskId16876">
+                                    <td>IGCC</td>
+                                    <td>IGCC.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\AppUp.IntelGraphicsExperience_1.100.5237.0_x64__8j3eq9eme6ctt\IGCC.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16876</td>
+                                </tr>
+                                <tr id="TaskId17096">
+                                    <td>vmware-tray</td>
+                                    <td>vmware-tray.exe</td>
+                                    <td>D:\Program Files (x86)\VMware\VMware Workstation\vmware-tray.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>17096</td>
+                                </tr>
+                                <tr id="TaskId17892">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>17892</td>
+                                </tr>
+                                <tr id="TaskId15728">
+                                    <td>MicrosoftEdgeUpdate</td>
+                                    <td>MicrosoftEdgeUpdate.exe</td>
+                                    <td>C:\Program Files (x86)\Microsoft\EdgeUpdate\MicrosoftEdgeUpdate.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>15728</td>
+                                </tr>
+                                <tr id="TaskId17732">
+                                    <td>SgrmBroker</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>17732</td>
+                                </tr>
+                                <tr id="TaskId18112">
+                                    <td>svchost</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>18112</td>
+                                </tr>
+                                <tr id="TaskId17436">
+                                    <td>wmpnetwk</td>
+                                    <td>wmpnetwk.exe</td>
+                                    <td>C:\Program Files\Windows Media Player\wmpnetwk.exe</td>
+                                    <td>NT AUTHORITY\NETWORK SERVICE</td>
+                                    <td>17436</td>
+                                </tr>
+                                <tr id="TaskId17456">
+                                    <td>cloudmusic</td>
+                                    <td>cloudmusic.exe</td>
+                                    <td>D:\Program Files (x86)\Netease\CloudMusic\cloudmusic.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>17456</td>
+                                </tr>
+                                <tr id="TaskId18168">
+                                    <td>cloudmusic_reporter</td>
+                                    <td>cloudmusic_reporter.exe</td>
+                                    <td>D:\Program Files (x86)\Netease\CloudMusic\cloudmusic_reporter.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>18168</td>
+                                </tr>
+                                <tr id="TaskId15708">
+                                    <td>cloudmusic</td>
+                                    <td>cloudmusic.exe</td>
+                                    <td>D:\Program Files (x86)\Netease\CloudMusic\cloudmusic.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>15708</td>
+                                </tr>
+                                <tr id="TaskId14712">
+                                    <td>cloudmusic</td>
+                                    <td>cloudmusic.exe</td>
+                                    <td>D:\Program Files (x86)\Netease\CloudMusic\cloudmusic.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14712</td>
+                                </tr>
+                                <tr id="TaskId7928">
+                                    <td>CompPkgSrv</td>
+                                    <td>CompPkgSrv.exe</td>
+                                    <td>C:\Windows\System32\CompPkgSrv.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>7928</td>
+                                </tr>
+                                <tr id="TaskId14248">
+                                    <td>Microsoft.Media.Player</td>
+                                    <td>Microsoft.Media.Player.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\Microsoft.ZuneMusic_11.2309.6.0_x64__8wekyb3d8bbwe\Microsoft.Media.Player.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14248</td>
+                                </tr>
+                                <tr id="TaskId10396">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10396</td>
+                                </tr>
+                                <tr id="TaskId1072">
+                                    <td>CalculatorApp</td>
+                                    <td>CalculatorApp.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\Microsoft.WindowsCalculator_11.2307.4.0_x64__8wekyb3d8bbwe\CalculatorApp.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>1072</td>
+                                </tr>
+                                <tr id="TaskId9496">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>9496</td>
+                                </tr>
+                                <tr id="TaskId13976">
+                                    <td>PaintStudio.View</td>
+                                    <td>PaintStudio.View.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\Microsoft.MSPaint_6.2305.16087.0_x64__8wekyb3d8bbwe\PaintStudio.View.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>13976</td>
+                                </tr>
+                                <tr id="TaskId16464">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16464</td>
+                                </tr>
+                                <tr id="TaskId16484">
+                                    <td>WeChat</td>
+                                    <td>WeChat.exe</td>
+                                    <td>D:\Program Files (x86)\Tencent\WeChat\WeChat.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16484</td>
+                                </tr>
+                                <tr id="TaskId2612">
+                                    <td>mmcrashpad_handler64</td>
+                                    <td>mmcrashpad_handler64.exe</td>
+                                    <td>D:\Program Files (x86)\Tencent\WeChat\[3.9.8.15]\mmcrashpad_handler64.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>2612</td>
+                                </tr>
+                                <tr id="TaskId12040">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12040</td>
+                                </tr>
+                                <tr id="TaskId12552">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12552</td>
+                                </tr>
+                                <tr id="TaskId12124">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12124</td>
+                                </tr>
+                                <tr id="TaskId8312">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>8312</td>
+                                </tr>
+                                <tr id="TaskId5424">
+                                    <td>WeChatPlayer</td>
+                                    <td>WeChatPlayer.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\ThumbPlayer\4067\extracted\WeChatPlayer.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>5424</td>
+                                </tr>
+                                <tr id="TaskId18044">
+                                    <td>WeChatUtility</td>
+                                    <td>WeChatUtility.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\WeChatUtility\8085\extracted\WeChatUtility.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>18044</td>
+                                </tr>
+                                <tr id="TaskId14000">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14000</td>
+                                </tr>
+                                <tr id="TaskId17952">
+                                    <td>WeChatOCR</td>
+                                    <td>WeChatOCR.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\WeChatOCR\7061\extracted\WeChatOCR.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>17952</td>
+                                </tr>
+                                <tr id="TaskId8616">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>8616</td>
+                                </tr>
+                                <tr id="TaskId11232">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>11232</td>
+                                </tr>
+                                <tr id="TaskId14680">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14680</td>
+                                </tr>
+                                <tr id="TaskId9720">
+                                    <td>WeChatAppEx</td>
+                                    <td>WeChatAppEx.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Roaming\Tencent\WeChat\XPlugin\Plugins\RadiumWMPF\8461\extracted\runtime\WeChatAppEx.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>9720</td>
+                                </tr>
+                                <tr id="TaskId12960">
+                                    <td>Video.UI</td>
+                                    <td>Video.UI.exe</td>
+                                    <td>C:\Program
+                                        Files\WindowsApps\Microsoft.ZuneVideo_10.22091.10051.0_x64__8wekyb3d8bbwe\Video.UI.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12960</td>
+                                </tr>
+                                <tr id="TaskId9000">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>9000</td>
+                                </tr>
+                                <tr id="TaskId18272">
+                                    <td>ShellExperienceHost</td>
+                                    <td>ShellExperienceHost.exe</td>
+                                    <td>C:\Windows\SystemApps\ShellExperienceHost_cw5n1h2txyewy\ShellExperienceHost.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>18272</td>
+                                </tr>
+                                <tr id="TaskId3412">
+                                    <td>RuntimeBroker</td>
+                                    <td>RuntimeBroker.exe</td>
+                                    <td>C:\Windows\System32\RuntimeBroker.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>3412</td>
+                                </tr>
+                                <tr id="TaskId13576">
+                                    <td>devenv</td>
+                                    <td>devenv.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>13576</td>
+                                </tr>
+                                <tr id="TaskId13616">
+                                    <td>PerfWatson2</td>
+                                    <td>PerfWatson2.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\IDE\PerfWatson2.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>13616</td>
+                                </tr>
+                                <tr id="TaskId14352">
+                                    <td>Microsoft.ServiceHub.Controller</td>
+                                    <td>Microsoft.ServiceHub.Controller.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\controller\Microsoft.ServiceHub.Controller.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14352</td>
+                                </tr>
+                                <tr id="TaskId3376">
+                                    <td>ServiceHub.VSDetouredHost</td>
+                                    <td>ServiceHub.VSDetouredHost.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.AnyCPU\ServiceHub.VSDetouredHost.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>3376</td>
+                                </tr>
+                                <tr id="TaskId14800">
+                                    <td>ServiceHub.Host.dotnet.x64</td>
+                                    <td>ServiceHub.Host.dotnet.x64.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.Dotnet.x64\ServiceHub.Host.dotnet.x64.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14800</td>
+                                </tr>
+                                <tr id="TaskId17808">
+                                    <td>ServiceHub.ThreadedWaitDialog</td>
+                                    <td>ServiceHub.ThreadedWaitDialog.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.AnyCPU\ServiceHub.ThreadedWaitDialog.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>17808</td>
+                                </tr>
+                                <tr id="TaskId16748">
+                                    <td>ServiceHub.Host.netfx.x86</td>
+                                    <td>ServiceHub.Host.netfx.x86.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.netfx.x86\ServiceHub.Host.netfx.x86.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16748</td>
+                                </tr>
+                                <tr id="TaskId18968">
+                                    <td>ServiceHub.IndexingService</td>
+                                    <td>ServiceHub.IndexingService.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.Dotnet.x64\ServiceHub.IndexingService.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>18968</td>
+                                </tr>
+                                <tr id="TaskId11596">
+                                    <td>vsls-agent</td>
+                                    <td>vsls-agent.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\IDE\Extensions\Microsoft\LiveShare\Agent\vsls-agent.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>11596</td>
+                                </tr>
+                                <tr id="TaskId4312">
+                                    <td>ServiceHub.SettingsHost</td>
+                                    <td>ServiceHub.SettingsHost.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.AnyCPU\ServiceHub.SettingsHost.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>4312</td>
+                                </tr>
+                                <tr id="TaskId4368">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>4368</td>
+                                </tr>
+                                <tr id="TaskId4444">
+                                    <td>ServiceHub.RoslynCodeAnalysisService</td>
+                                    <td>ServiceHub.RoslynCodeAnalysisService.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.AnyCPU\ServiceHub.RoslynCodeAnalysisService.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>4444</td>
+                                </tr>
+                                <tr id="TaskId19568">
+                                    <td>ServiceHub.Host.AnyCPU</td>
+                                    <td>ServiceHub.Host.AnyCPU.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.AnyCPU\ServiceHub.Host.AnyCPU.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>19568</td>
+                                </tr>
+                                <tr id="TaskId20324">
+                                    <td>ServiceHub.TestWindowStoreHost</td>
+                                    <td>ServiceHub.TestWindowStoreHost.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.AnyCPU\ServiceHub.TestWindowStoreHost.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20324</td>
+                                </tr>
+                                <tr id="TaskId20380">
+                                    <td>ServiceHub.IntellicodeModelService</td>
+                                    <td>ServiceHub.IntellicodeModelService.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.netfx.x64\ServiceHub.IntellicodeModelService.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20380</td>
+                                </tr>
+                                <tr id="TaskId20412">
+                                    <td>ServiceHub.Host.dotnet.x64</td>
+                                    <td>ServiceHub.Host.dotnet.x64.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.Dotnet.x64\ServiceHub.Host.dotnet.x64.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20412</td>
+                                </tr>
+                                <tr id="TaskId20556">
+                                    <td>node</td>
+                                    <td>node.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\MSBuild\Microsoft\VisualStudio\NodeJs\win-x64\node.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20556</td>
+                                </tr>
+                                <tr id="TaskId7592">
+                                    <td>node</td>
+                                    <td>node.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\MSBuild\Microsoft\VisualStudio\NodeJs\win-x64\node.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>7592</td>
+                                </tr>
+                                <tr id="TaskId19260">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>19260</td>
+                                </tr>
+                                <tr id="TaskId17380">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>17380</td>
+                                </tr>
+                                <tr id="TaskId20540">
+                                    <td>node</td>
+                                    <td>node.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\MSBuild\Microsoft\VisualStudio\NodeJs\win-x64\node.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20540</td>
+                                </tr>
+                                <tr id="TaskId19152">
+                                    <td>node</td>
+                                    <td>node.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\MSBuild\Microsoft\VisualStudio\NodeJs\win-x64\node.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>19152</td>
+                                </tr>
+                                <tr id="TaskId20456">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20456</td>
+                                </tr>
+                                <tr id="TaskId8900">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>8900</td>
+                                </tr>
+                                <tr id="TaskId1760">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>1760</td>
+                                </tr>
+                                <tr id="TaskId3220">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>3220</td>
+                                </tr>
+                                <tr id="TaskId992">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>992</td>
+                                </tr>
+                                <tr id="TaskId14936">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14936</td>
+                                </tr>
+                                <tr id="TaskId20600">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20600</td>
+                                </tr>
+                                <tr id="TaskId20084">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20084</td>
+                                </tr>
+                                <tr id="TaskId20868">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20868</td>
+                                </tr>
+                                <tr id="TaskId2088">
+                                    <td>ServiceHub.DataWarehouseHost</td>
+                                    <td>ServiceHub.DataWarehouseHost.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\ServiceHub\Hosts\ServiceHub.Host.Dotnet.x64\ServiceHub.DataWarehouseHost.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>2088</td>
+                                </tr>
+                                <tr id="TaskId18092">
+                                    <td>WebViewHost</td>
+                                    <td>WebViewHost.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\Common7\IDE\WebViewHost\WebViewHost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>18092</td>
+                                </tr>
+                                <tr id="TaskId22972">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>22972</td>
+                                </tr>
+                                <tr id="TaskId17904">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>17904</td>
+                                </tr>
+                                <tr id="TaskId2432">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>2432</td>
+                                </tr>
+                                <tr id="TaskId12932">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12932</td>
+                                </tr>
+                                <tr id="TaskId20136">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20136</td>
+                                </tr>
+                                <tr id="TaskId10248">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10248</td>
+                                </tr>
+                                <tr id="TaskId24820">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>24820</td>
+                                </tr>
+                                <tr id="TaskId24972">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>24972</td>
+                                </tr>
+                                <tr id="TaskId25136">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>25136</td>
+                                </tr>
+                                <tr id="TaskId25504">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>25504</td>
+                                </tr>
+                                <tr id="TaskId25416">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>25416</td>
+                                </tr>
+                                <tr id="TaskId25728">
+                                    <td>Code</td>
+                                    <td>Code.exe</td>
+                                    <td>D:\Programs\Microsoft VS Code\Code.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>25728</td>
+                                </tr>
+                                <tr id="TaskId21876">
+                                    <td>Clash for Windows</td>
+                                    <td>Clash for Windows.exe</td>
+                                    <td>D:\Program Files\Clash for Windows\Clash for Windows.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>21876</td>
+                                </tr>
+                                <tr id="TaskId9868">
+                                    <td>Clash for Windows</td>
+                                    <td>Clash for Windows.exe</td>
+                                    <td>D:\Program Files\Clash for Windows\Clash for Windows.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>9868</td>
+                                </tr>
+                                <tr id="TaskId22068">
+                                    <td>Clash for Windows</td>
+                                    <td>Clash for Windows.exe</td>
+                                    <td>D:\Program Files\Clash for Windows\Clash for Windows.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>22068</td>
+                                </tr>
+                                <tr id="TaskId20368">
+                                    <td>Clash for Windows</td>
+                                    <td>Clash for Windows.exe</td>
+                                    <td>D:\Program Files\Clash for Windows\Clash for Windows.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20368</td>
+                                </tr>
+                                <tr id="TaskId18128">
+                                    <td>clash-win64</td>
+                                    <td>clash-win64.exe</td>
+                                    <td>D:\Program Files\Clash for
+                                        Windows\resources\static\files\win\x64\clash-win64.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>18128</td>
+                                </tr>
+                                <tr id="TaskId12428">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>12428</td>
+                                </tr>
+                                <tr id="TaskId21740">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>21740</td>
+                                </tr>
+                                <tr id="TaskId10504">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>10504</td>
+                                </tr>
+                                <tr id="TaskId8408">
+                                    <td>QQ</td>
+                                    <td>QQ.exe</td>
+                                    <td>D:\Program Files\Tencent\QQNT\QQ.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>8408</td>
+                                </tr>
+                                <tr id="TaskId25476">
+                                    <td>crashpad_handler</td>
+                                    <td>crashpad_handler.exe</td>
+                                    <td>D:\Program
+                                        Files\Tencent\QQNT\resources\app\versions\9.9.5-18394\win64\crashpad_handler.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>25476</td>
+                                </tr>
+                                <tr id="TaskId26484">
+                                    <td>QQ</td>
+                                    <td>QQ.exe</td>
+                                    <td>D:\Program Files\Tencent\QQNT\QQ.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>26484</td>
+                                </tr>
+                                <tr id="TaskId2236">
+                                    <td>QQ</td>
+                                    <td>QQ.exe</td>
+                                    <td>D:\Program Files\Tencent\QQNT\QQ.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>2236</td>
+                                </tr>
+                                <tr id="TaskId24224">
+                                    <td>QQ</td>
+                                    <td>QQ.exe</td>
+                                    <td>D:\Program Files\Tencent\QQNT\QQ.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>24224</td>
+                                </tr>
+                                <tr id="TaskId10868">
+                                    <td>QQScreenshot</td>
+                                    <td>QQScreenshot.exe</td>
+                                    <td>D:\Program
+                                        Files\Tencent\QQNT\resources\app\versions\9.9.5-18394\QQScreenShot\BinRelease\QQScreenshot.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10868</td>
+                                </tr>
+                                <tr id="TaskId23420">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>23420</td>
+                                </tr>
+                                <tr id="TaskId5228">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>5228</td>
+                                </tr>
+                                <tr id="TaskId31548">
+                                    <td>QQLiveService</td>
+                                    <td>QQLiveService.exe</td>
+                                    <td>D:\Program Files (x86)\Tencent\QQLive\QQLiveService.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>31548</td>
+                                </tr>
+                                <tr id="TaskId31588">
+                                    <td>crashpad_handler</td>
+                                    <td>crashpad_handler.exe</td>
+                                    <td>D:\Program Files (x86)\Tencent\QQLive\crashpad_handler.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>31588</td>
+                                </tr>
+                                <tr id="TaskId23652">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>23652</td>
+                                </tr>
+                                <tr id="TaskId26744">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>26744</td>
+                                </tr>
+                                <tr id="TaskId15844">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>15844</td>
+                                </tr>
+                                <tr id="TaskId23340">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>23340</td>
+                                </tr>
+                                <tr id="TaskId24092">
+                                    <td>msedgewebview2</td>
+                                    <td>msedgewebview2.exe</td>
+                                    <td>C:\Program Files
+                                        (x86)\Microsoft\EdgeWebView\Application\119.0.2151.72\msedgewebview2.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>24092</td>
+                                </tr>
+                                <tr id="TaskId29136">
+                                    <td>msedgewebview2</td>
+                                    <td>msedgewebview2.exe</td>
+                                    <td>C:\Program Files
+                                        (x86)\Microsoft\EdgeWebView\Application\119.0.2151.72\msedgewebview2.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>29136</td>
+                                </tr>
+                                <tr id="TaskId19948">
+                                    <td>msedgewebview2</td>
+                                    <td>msedgewebview2.exe</td>
+                                    <td>C:\Program Files
+                                        (x86)\Microsoft\EdgeWebView\Application\119.0.2151.72\msedgewebview2.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>19948</td>
+                                </tr>
+                                <tr id="TaskId9648">
+                                    <td>msedgewebview2</td>
+                                    <td>msedgewebview2.exe</td>
+                                    <td>C:\Program Files
+                                        (x86)\Microsoft\EdgeWebView\Application\119.0.2151.72\msedgewebview2.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>9648</td>
+                                </tr>
+                                <tr id="TaskId30928">
+                                    <td>msedgewebview2</td>
+                                    <td>msedgewebview2.exe</td>
+                                    <td>C:\Program Files
+                                        (x86)\Microsoft\EdgeWebView\Application\119.0.2151.72\msedgewebview2.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>30928</td>
+                                </tr>
+                                <tr id="TaskId10284">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10284</td>
+                                </tr>
+                                <tr id="TaskId21812">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>21812</td>
+                                </tr>
+                                <tr id="TaskId26932">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>26932</td>
+                                </tr>
+                                <tr id="TaskId20596">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20596</td>
+                                </tr>
+                                <tr id="TaskId25972">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>25972</td>
+                                </tr>
+                                <tr id="TaskId29636">
+                                    <td>msedgewebview2</td>
+                                    <td>msedgewebview2.exe</td>
+                                    <td>C:\Program Files
+                                        (x86)\Microsoft\EdgeWebView\Application\119.0.2151.72\msedgewebview2.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>29636</td>
+                                </tr>
+                                <tr id="TaskId26000">
+                                    <td>msedgewebview2</td>
+                                    <td>msedgewebview2.exe</td>
+                                    <td>C:\Program Files
+                                        (x86)\Microsoft\EdgeWebView\Application\119.0.2151.72\msedgewebview2.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>26000</td>
+                                </tr>
+                                <tr id="TaskId16708">
+                                    <td>svchost</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>undefined</td>
+                                    <td>16708</td>
+                                </tr>
+                                <tr id="TaskId30124">
+                                    <td>taskhostw</td>
+                                    <td>taskhostw.exe</td>
+                                    <td>C:\Windows\System32\taskhostw.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>30124</td>
+                                </tr>
+                                <tr id="TaskId26576">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\LOCAL SERVICE</td>
+                                    <td>26576</td>
+                                </tr>
+                                <tr id="TaskId21892">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>21892</td>
+                                </tr>
+                                <tr id="TaskId26736">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>26736</td>
+                                </tr>
+                                <tr id="TaskId27840">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>27840</td>
+                                </tr>
+                                <tr id="TaskId16756">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>16756</td>
+                                </tr>
+                                <tr id="TaskId25564">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>25564</td>
+                                </tr>
+                                <tr id="TaskId10828">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>10828</td>
+                                </tr>
+                                <tr id="TaskId18048">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>18048</td>
+                                </tr>
+                                <tr id="TaskId22384">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>22384</td>
+                                </tr>
+                                <tr id="TaskId22872">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>22872</td>
+                                </tr>
+                                <tr id="TaskId24800">
+                                    <td>chrome</td>
+                                    <td>chrome.exe</td>
+                                    <td>C:\Program Files\Google\Chrome\Application\chrome.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>24800</td>
+                                </tr>
+                                <tr id="TaskId26088">
+                                    <td>Taskmgr</td>
+                                    <td>Taskmgr.exe</td>
+                                    <td>C:\Windows\System32\Taskmgr.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>26088</td>
+                                </tr>
+                                <tr id="TaskId25780">
+                                    <td>uTools</td>
+                                    <td>uTools.exe</td>
+                                    <td>C:\Users\Administrator\AppData\Local\Programs\utools\uTools.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>25780</td>
+                                </tr>
+                                <tr id="TaskId24472">
+                                    <td>HipsDaemon</td>
+                                    <td>HipsDaemon.exe</td>
+                                    <td>C:\Program Files (x86)\Huorong\Sysdiag\bin\HipsDaemon.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>24472</td>
+                                </tr>
+                                <tr id="TaskId28464">
+                                    <td>usysdiag</td>
+                                    <td>usysdiag.exe</td>
+                                    <td>C:\Program Files (x86)\Huorong\Sysdiag\bin\usysdiag.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>28464</td>
+                                </tr>
+                                <tr id="TaskId19036">
+                                    <td>SearchProtocolHost</td>
+                                    <td>SearchProtocolHost.exe</td>
+                                    <td>C:\Windows\System32\SearchProtocolHost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>19036</td>
+                                </tr>
+                                <tr id="TaskId18096">
+                                    <td>MSBuild</td>
+                                    <td>MSBuild.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\MSBuild\Current\Bin\amd64\MSBuild.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>18096</td>
+                                </tr>
+                                <tr id="TaskId26128">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>26128</td>
+                                </tr>
+                                <tr id="TaskId17928">
+                                    <td>VBCSCompiler</td>
+                                    <td>VBCSCompiler.exe</td>
+                                    <td>D:\Program Files\Microsoft Visual
+                                        Studio\2022\Enterprise\MSBuild\Current\Bin\Roslyn\VBCSCompiler.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>17928</td>
+                                </tr>
+                                <tr id="TaskId28668">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>28668</td>
+                                </tr>
+                                <tr id="TaskId32840">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>32840</td>
+                                </tr>
+                                <tr id="TaskId29484">
+                                    <td>QQ</td>
+                                    <td>QQ.exe</td>
+                                    <td>D:\Program Files\Tencent\QQNT\QQ.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>29484</td>
+                                </tr>
+                                <tr id="TaskId27852">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>27852</td>
+                                </tr>
+                                <tr id="TaskId1896">
+                                    <td>CentralControl</td>
+                                    <td>CentralControl.exe</td>
+                                    <td>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0\CentralControl.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>1896</td>
+                                </tr>
+                                <tr id="TaskId20148">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>20148</td>
+                                </tr>
+                                <tr id="TaskId33300">
+                                    <td>CentralControl</td>
+                                    <td>CentralControl.exe</td>
+                                    <td>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0\CentralControl.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>33300</td>
+                                </tr>
+                                <tr id="TaskId22532">
+                                    <td>CentralControl</td>
+                                    <td>CentralControl.exe</td>
+                                    <td>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0\CentralControl.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>22532</td>
+                                </tr>
+                                <tr id="TaskId33644">
+                                    <td>CentralControl</td>
+                                    <td>CentralControl.exe</td>
+                                    <td>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0\CentralControl.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>33644</td>
+                                </tr>
+                                <tr id="TaskId3772">
+                                    <td>CentralControl</td>
+                                    <td>CentralControl.exe</td>
+                                    <td>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0\CentralControl.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>3772</td>
+                                </tr>
+                                <tr id="TaskId3840">
+                                    <td>CentralControl</td>
+                                    <td>CentralControl.exe</td>
+                                    <td>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0\CentralControl.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>3840</td>
+                                </tr>
+                                <tr id="TaskId21512">
+                                    <td>CentralControl</td>
+                                    <td>CentralControl.exe</td>
+                                    <td>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0\CentralControl.exe
+                                    </td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>21512</td>
+                                </tr>
+                                <tr id="TaskId27144">
+                                    <td>svchost</td>
+                                    <td>svchost.exe</td>
+                                    <td>C:\Windows\System32\svchost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>27144</td>
+                                </tr>
+                                <tr id="TaskId2200">
+                                    <td>cmd</td>
+                                    <td>cmd.exe</td>
+                                    <td>C:\Windows\System32\cmd.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>2200</td>
+                                </tr>
+                                <tr id="TaskId14840">
+                                    <td>conhost</td>
+                                    <td>conhost.exe</td>
+                                    <td>C:\Windows\System32\conhost.exe</td>
+                                    <td>回忆如此多娇\Administrator</td>
+                                    <td>14840</td>
+                                </tr>
+                                <tr id="TaskId30964">
+                                    <td>SearchFilterHost</td>
+                                    <td>SearchFilterHost.exe</td>
+                                    <td>C:\Windows\System32\SearchFilterHost.exe</td>
+                                    <td>NT AUTHORITY\SYSTEM</td>
+                                    <td>30964</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div id="menus">
+                        <div data-id="killTask">结束任务</div>
+                        <div data-id="attribute">属性</div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-3">
+                <div class="row" style="height: 49.9vh;">
+                    <h1>磁盘状态</h1>
+                    <label for="diskSelect" class="form-label">请选择一个磁盘</label>
+                    <select name="" id="diskSelect" class="form-select" onchange="DiskDriveSelectChange(this);">
+                    </select>
+                    <div id="DiskOutputChart" style="height: 50%; width:50%;">
+                        <p>读取速度</p>
+                    </div>
+                    <div id="DiskInputChart" style="height: 50%; width:50%;">
+                        <p>写入速度</p>
+                    </div>
+                    <div>
+                        <p>磁盘空间</p>
+                    </div>
+
+
+                </div>
+                <div class="row" style="height: 49.9vh;   position: relative;">
+                    <!-- <h1>网络状态</h1> -->
+                    <p>系统扬声器音量</p>
+                    <div style="height: 60%; width: auto; margin: auto; margin-right: 0em; padding: 0px;">
+
+                        <input type="range" id="volume" value="" min="0" max="100" step="1" oninput="changeVolume(this)"
+                            style=" appearance: slider-vertical; height: 100%;">
+                        <p id="volumeView">10</p>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+
+    </div>
+    <script src="/js/echarts.min.js"></script>
+    <script src="/js/bootstrap.js"></script>
+    <script src="/js/dataQueue.js"></script>
+    <script>
+        class Chart {
+            constructor(element, unit, value) {
+                this.element = element;
+                this.unit = unit;
+                this.value = value;
+            }
+            draw() {
+                this.myChart = echarts.init(this.element, null, {
+                    renderer: 'svg',
+                    useDirtyRect: false
+                });
+                var app = {};
+
+                var option;
+
+                option = {
+                    series: [
+                        {
+                            type: 'gauge',
+                            axisLine: {
+                                lineStyle: {
+                                    width: 5,
+                                    color: [
+                                        [0.3, '#67e0e3'],
+                                        [0.7, '#37a2da'],
+                                        [1, '#fd666d']
+                                    ]
+                                }
+                            },
+                            pointer: {
+                                itemStyle: {
+                                    color: 'auto'
+                                }
+                            },
+                            axisTick: {
+                                distance: -30,
+                                length: 10,
+                                lineStyle: {
+                                    color: '#fff',
+                                    width: 0
+                                }
+                            },
+                            splitLine: {
+                                distance: -30,
+                                length: 30,
+                                lineStyle: {
+                                    color: '#fff',
+                                    width: 2
+                                }
+                            },
+                            axisLabel: {
+                                color: 'inherit',
+                                distance: 6,
+                                fontSize: 8
+                            },
+                            detail: {
+                                valueAnimation: true,
+                                formatter: '{value} ' + this.unit,
+                                color: 'inherit',
+                                fontSize: "1em"
+                            },
+                            data: [
+                                {
+                                    value: this.value
+                                }
+                            ]
+                        }
+                    ]
+                };
+                if (option && typeof option === 'object') {
+                    this.myChart.setOption(option);
+                }
+
+                window.addEventListener('resize', this.myChart.resize);
+            }
+            setvalue(value, unit = "MB/S") {
+                this.unit = unit;
+                this.myChart.setOption({
+                    series: [
+                        {
+                            detail: {
+
+                                formatter: '{value} ' + this.unit,
+
+                            },
+                            data: [
+                                {
+                                    value: value
+                                }
+                            ]
+                        }
+                    ]
+                });
+            }
+        }
+        // 网络状态
+        var NetUpLoadChart = new Chart(document.getElementById("upnetwork"), "KB/s", 0);
+        var NetDownChart = new Chart(document.getElementById("downnetwork"), "KB/s", 0);
+
+        // 磁盘图表
+        var DiskInputChart = new Chart(document.getElementById("DiskInputChart"), "KB/s", 0);
+        var DiskOutputChart = new Chart(document.getElementById("DiskOutputChart"), "KB/s", 0);
+
+        DiskInputChart.draw();
+        DiskOutputChart.draw();
+
+        NetUpLoadChart.draw();
+        NetDownChart.draw();
+        function changeVolume(element) {
+            document.getElementById("volumeView").innerText = element.value;
+
+            PostServerVolume(element.value);
+        }
+        function setVolumeValue(value) {
+            let volume = document.getElementById("volume");
+            volume.value = value;
+            changeVolume(volume);
+        }
+        function PostServerVolume(value) {
+            formium.postMessage("changeVolume", value);
+        }
+        let commandViewDataElement = document.getElementById("input");
+        commandViewDataElement.addEventListener('keyup', function (event) {
+            if (event.key === 'Enter') {
+                const inputText = commandViewDataElement.value;
+                commandViewDataElement.value = '';
+                PostServerCommand(inputText);
+            }
+        });
+        const outputElement = document.getElementById('output');
+        const inputElement = document.getElementById('input');
+        const containerElement = document.getElementById('terminal');
+        let textNode = document.createTextNode(" ");
+        containerElement.addEventListener("click", function (event) {
+            const selectedText = window.getSelection().toString();
+            if (!selectedText) {
+                inputElement.focus();
+            } else {
+                event.stopPropagation();
+            }
+        });
+        function upInput() {
+            const lastTextNode = getLastTextNode(outputElement);
+            if (lastTextNode) {
+                lastTextNode.parentNode.appendChild(textNode);
+            } else {
+                outputElement.appendChild(textNode);
+            }
+            const range = document.createRange();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, 0);
+            const rect = range.getBoundingClientRect();
+
+            const containerRect = containerElement.getBoundingClientRect();
+
+            const x = rect.x - containerRect.x;
+            const y = rect.y - containerRect.y;
+
+            const width = containerRect.width - x - 40;
+
+            inputElement.style.width = `${width}px`;
+
+            textNode.remove();
+        }
+        function getLastTextNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                return node;
+            }
+            const children = node.childNodes;
+            for (let i = children.length - 1; i >= 0; i--) {
+                const child = children[i];
+                const reslut = getLastTextNode(child);
+                if (reslut) {
+                    return reslut;
+                }
+            }
+            return null;
+        }
+        //发送命令到C#执行
+        function PostServerCommand(command) {
+            if (command == "cls" || command == "clear") {
+                outputElement.innerHTML = "";
+            }
+            formium.postMessage("executorCommand", command);
+        }
+        formium.addMessageDispatcher("commandDataUp", (data) => {
+            let fragment = document.createDocumentFragment();
+            for (let i = 0; i < data.length; i++) {
+                let p = document.createElement("p");
+                if (data[i].newData) {
+                    outputElement.innerHTML = "";
+                }
+                if (data[i].status) {
+                    p.style.color = "red";
+                }
+                p.innerText = data[i].data;
+                fragment.append(p);
+            }
+            SetCommandDataViewValue(fragment);
+        });
+        //设置终端数据
+        function SetCommandDataViewValue(fragment) {
+            if (fragment != null) {
+                outputElement.append(fragment);
+            }
+
+            // 滚动到底部
+            upInput();
+            containerElement.scrollTop = terminal.scrollHeight;
+
+        }
+
+    </script>
+    <!-- cpu状态绘制-->
+    <script>
+        var queue = new dataQueue();
+        var canvas = document.getElementById("cpuCanvas");
+        canvas.width = canvas.clientWidth * devicePixelRatio;
+        canvas.height = canvas.clientHeight * devicePixelRatio;
+        var ctx = canvas.getContext("2d");
+        function drawLineChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.fillStyle = 'blue'
+
+            let value = queue.getAll();
+            for (let i = 0; i < value.length; i++) {
+                ctx.lineTo(ConvertIndexToX(value.length, value.length - 1 - i), PercentageToY(value[i]));
+                if (value.length - 1 - i == 0) {
+                    ctx.lineTo(canvas.clientWidth * devicePixelRatio, canvas.clientHeight * devicePixelRatio);
+                    ctx.lineTo(ConvertIndexToX(value.length, i + 1), canvas.clientHeight * devicePixelRatio);
+                    ctx.fill();
+                }
+            }
+            ctx.stroke();
+        }
+        // 将一个百分比转化为y
+        function PercentageToY(percentage) {
+            const canvasHeight = canvas.clientHeight;
+            const y = (canvasHeight - ((canvasHeight / 100) * percentage)) * devicePixelRatio;
+            return y;
+        }
+        //将数据索引位置转化为X值
+        function ConvertIndexToX(accuracy, index) {
+            const canvasWidth = canvas.clientWidth;
+            let x = ((canvasWidth / accuracy) * index) * devicePixelRatio;
+            //反转X轴
+            x = canvasWidth * devicePixelRatio - x;
+            return x;
+        }
+        //监听窗体大小改变事件
+        window.onresize = function () {
+            canvas.width = canvas.clientWidth * devicePixelRatio;
+            canvas.height = canvas.clientHeight * devicePixelRatio;
+        }
+        function pushData(data, accuracy) {
+            if (queue.size() == accuracy) {
+                queue.dequeue();
+            }
+            queue.push(data);
+            drawLineChart();
+        }
+    </script>
+
+    <!--网络设备和磁盘设备处理-->
+    <script>
+        var diskSelect = document.getElementById("diskSelect");
+        var netWorkSelect = document.getElementById("networkSelect");
+        formium.addMessageDispatcher("setDiskAndNetWorkData", (data) => {
+
+            let diskNames = data.DiskDriveName;
+            let netWorkDrive = data.NetWorkDrivename;
+
+            diskSelect.innerHTML = "";
+            netWorkSelect.innerHTML = "";
+
+            //创建文档节点
+            let diskNamefragment = document.createDocumentFragment();
+            for (let i = 0; i < diskNames.length; i++) {
+                let diskNameOption = document.createElement("option");
+                diskNameOption.value = diskNames[i];
+                diskNameOption.innerText = diskNames[i];
+                if (diskNames[i] == data.SelectDiskDriveName) {
+                    diskNameOption.selected = true;
+                }
+                diskNamefragment.append(diskNameOption);
+            }
+            diskSelect.append(diskNamefragment);
+
+            let netWorkNamefragment = document.createDocumentFragment();
+            for (let i = 0; i < netWorkDrive.length; i++) {
+                let netWorkNameOption = document.createElement("option");
+                netWorkNameOption.value = netWorkDrive[i];
+                netWorkNameOption.innerText = netWorkDrive[i];
+                if (netWorkDrive[i] == data.SelectNetWorkDriveName) {
+                    netWorkNameOption.selected = true;
+                }
+                netWorkNamefragment.append(netWorkNameOption);
+            }
+            netWorkSelect.append(netWorkNamefragment);
+
+        });
+        //磁盘设备选中改变
+        function DiskDriveSelectChange(value) {
+            formium.postMessage("changeDiskSelect", value.value);
+        }
+        //网络设备选中改变
+        function NetWorkDriveSelectChange(value) {
+            formium.postMessage("changeNetWorkSelect", value.value);
+        }
+    </script>
+    <!-- 任务列表事件处理 -->
+    <script>
+        var elementUl = document.getElementById("taskView");
+        //数据更新处理
+        function updata() {
+            elementUl.innerHTML = "";
+            var temp = document.createDocumentFragment();
+            for (var i = 0; i < Math.round(Math.random(10) * 150); i++) {
+                var templi = document.createElement("li");
+                templi.innerText = i;
+                temp.append(templi);
+            }
+            elementUl.append(temp);
+        }
+        //注册事件，获取来自C#端的数据内容，并处理，加载到页面中
+        formium.addMessageDispatcher("setTaskData", (data) => {
+            //解析data数据
+            let AddTask = data.AddTask;
+            AddTaskDataToView(AddTask);
+
+            let RemoveTask = data.RemoveTask;
+
+            RemoveTaskDataToView(RemoveTask);
+        });
+        function AddTaskDataToView(AddTask) {
+            //创建文档片段
+            let docmentFragment = document.createDocumentFragment();
+            for (let i = 0; i < AddTask.length; i++) {
+                //一行内容
+                let tr = document.createElement("tr");
+                tr.id = "TaskId" + AddTask[i].Id;
+                //名字
+                let nameTr = document.createElement("td");
+                nameTr.innerText = AddTask[i].Name;
+                //映像文件名
+                let ImageFileName = document.createElement("td");
+                ImageFileName.innerText = AddTask[i].ImageName;
+                //映像文件路径
+                let ImageFilePath = document.createElement("td");
+                ImageFilePath.innerText = AddTask[i].ImageFilePath;
+                //进程启动用户
+                let ProcessStartUserName = document.createElement("td");
+                ProcessStartUserName.innerText = AddTask[i].UserName;
+                //进程Id
+                let ProcessId = document.createElement("td");
+                ProcessId.innerText = AddTask[i].Id;
+                tr.append(nameTr);
+                tr.append(ImageFileName);
+                tr.append(ImageFilePath);
+                tr.append(ProcessStartUserName);
+                tr.append(ProcessId);
+                docmentFragment.append(tr);
+            }
+            elementUl.getElementsByTagName("tbody")[0].append(docmentFragment);
+        }
+        function RemoveTaskDataToView(RemoveTask) {
+            for (let i = 0; i < RemoveTask.length; i++) {
+                //获取对应Id
+                const id = RemoveTask[i].Id;
+                document.getElementById("TaskId" + id).remove();
+            }
+        }
+        const menus = document.getElementById("menus");
+        var selectElement = null;
+        elementUl.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            if (selectElement != null) {
+                selectElement.classList.remove("liSelect");
+            }
+            selectElement = e.target;
+            selectElement.classList.add("liSelect");
+            showMenu(e);
+        });
+        document.addEventListener("click", hideMenu, false); // 隐藏菜单
+        function showMenu(e) {
+            menus.style.top = `${e.clientY}px`;
+            menus.style.left = `${e.clientX}px`;
+            menus.style.display = "flex";
+        }
+        function hideMenu() {
+            selectElement.classList.remove("liSelect");
+            menus.style.display = "none";
+        }
+        const menusChild = document.querySelectorAll("#menus div");
+        menusChild.forEach(item => {
+            item.onclick = (e) => {
+                console.log(e.target.dataset.id, '元素');
+                hideMenu()
+            }
+        });
+    </script>
+</body>
+
+</html>

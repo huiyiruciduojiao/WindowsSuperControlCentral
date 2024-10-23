@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>终端模拟</title>
+    <style>
+        #container {
+
+            margin: auto;
+            width: 900px;
+            height: 600px;
+        }
+
+        #terminal {
+            height: 100%;
+            overflow-y: auto;
+            background-color: black;
+            color: #fff;
+        }
+
+        #output,
+        #output>p {
+            display: inline;
+        }
+
+        #input {
+            width: 0px;
+            color: #fff;
+            border: none;
+            outline: none;
+            display: inline-block;
+            background-color: black;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="terminal">
+            <pre id="output"><p id="prompt">C:\Users\Administrator></p></pre>
+            <input id="input" type="text" autofocus>
+        </div>
+    </div>
+    <script>
+        const outputElement = document.getElementById('output');
+        const inputElement = document.getElementById('input');
+        const terminal = document.getElementById('terminal');
+        let textNode = document.createTextNode(" ");
+
+        upInput();
+        inputElement.addEventListener('keyup', function (event) {
+            if (event.key === 'Enter') {
+                const inputText = inputElement.value;
+                inputElement.value = '';
+                simulateCommandExecution(inputText);
+            }
+        });
+        terminal.addEventListener("click", function (event) {
+            const selectedText = window.getSelection().toString();
+            if (!selectedText) {
+                inputElement.focus();
+            } else {
+                event.stopPropagation();
+            }
+        });
+        window.onresize = function () {
+            upInput();
+        }
+        function upInput() {
+            const lastTextNode = getLastTextNode(outputElement);
+            if (lastTextNode) {
+                lastTextNode.parentNode.appendChild(textNode);
+            } else {
+                outputElement.appendChild(textNode);
+            }
+            const range = document.createRange();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, 0);
+            const rect = range.getBoundingClientRect();
+
+            const containerRect = terminal.getBoundingClientRect();
+
+            const x = rect.x - containerRect.x;
+
+            const width = terminal.scrollWidth - x - 10;
+
+            inputElement.style.width = `${width}px`;
+
+            textNode.remove();
+        }
+        function getLastTextNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                return node;
+            }
+            const children = node.childNodes;
+            for (let i = children.length - 1; i >= 0; i--) {
+                const child = children[i];
+                const reslut = getLastTextNode(child);
+                if (reslut) {
+                    return reslut;
+                }
+            }
+            return null;
+        }
+        //模拟命令执行
+        function simulateCommandExecution(command) {
+            let reslut = "命令:" + command + " 执行成功\r\n";
+            simulateCommandCallback(reslut);
+
+        }
+        //模拟命令执行回调函数
+        function simulateCommandCallback(reslut) {
+            //假设下面有非常多数据
+            let fragment = document.createDocumentFragment();
+            const promptElement = document.getElementById("prompt");
+            promptElement.remove();
+            let p = document.createElement("p");
+            p.innerText = reslut;
+            fragment.appendChild(p);
+            fragment.appendChild(promptElement);
+            outputElement.appendChild(fragment);
+            upInput();
+            terminal.scrollTop = terminal.scrollHeight;
+        }
+    </script>
+</body>
+
+</html>

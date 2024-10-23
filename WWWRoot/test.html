@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        #temp {
+            width: 600px;
+            height: 600px;
+            background-color: red;
+            padding: 0px;
+            margin: auto;
+            margin-top: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="temp">
+        <canvas id="draw">
+
+        </canvas>
+    </div>
+    <script>
+        let canvas = document.getElementById("draw");
+        canvas.width = canvas.parentElement.clientWidth * window.devicePixelRatio;
+        canvas.height = canvas.parentElement.clientHeight * window.devicePixelRatio;
+        let ctx = canvas.getContext("2d");
+
+
+        class Point {
+            constructor(x, y) {
+                this.x = x;
+                this.y = y;
+                this.r = 1;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.r, 0, 2 * Math.PI);
+                ctx.fill();
+            }
+
+        }
+        //线条
+        class Line {
+            constructor(x1, y1, x2, y2) {
+                this.x1 = x1;
+                this.y1 = y1;
+                this.x2 = x2;
+                this.y2 = y2;
+            }
+            draw() {
+                ctx.beginPath();
+                ctx.moveTo(this.x1, this.y1);
+                ctx.lineTo(this.x2, this.y2);
+                ctx.stroke();
+
+            }
+        }
+        function draw() {
+            //清空画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            for (let i = 0; i < Lines.length; i++) {
+                Lines[i].draw();
+            }
+            requestAnimationFrame(draw);
+        }
+        Lines = [];
+        for (let i = 0; i < 100; i++) {
+            let x1 = Math.random() * 400;
+            let y1 = Math.random() * 400;
+            let x2 = Math.random() * 400;
+            let y2 = Math.random() * 400;
+            Lines.push(new Line(x1, y1, x2, y2));
+        }
+
+        Balls = [];
+        for (let i = 0; i < 100; i++) {
+            let x = Math.random() * 400;
+            let y = Math.random() * 400;
+            Balls.push(new Point(50 + i, 300 + i));
+        }
+
+        draw();
+    </script>
+</body>
+
+</html>

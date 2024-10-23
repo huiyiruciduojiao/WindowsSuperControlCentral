@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模拟终端</title>
+    <style>
+        body {
+            font-family: monospace;
+            background-color: #000;
+            color: #00FF00;
+            margin: 0;
+            padding: 0;
+        }
+
+        .terminal {
+            border: 1px solid #00FF00;
+            padding: 10px;
+            margin: 80px;
+            background-color: #000;
+            height: 400px;
+            overflow-y: auto;
+        }
+
+        #output {
+            display: inline;
+        }
+
+        #input {
+            width: auto;
+            background-color: #000;
+            color: #00FF00;
+            border: none;
+            outline: none;
+            display: inline-block;
+            break-after: auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="terminal" id="container">
+        <pre
+            id="output">Microsoft Windows [版本 10.0.19045.3570]<br>(c) Microsoft Corporation。保留所有权利。<br><br>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0&gt;dir<br> 驱动器 H 中的卷是 数据<br> 卷的序列号是 607C-0B4B<br><br> H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0 的目录<br><br>2023/10/26  15:50    &lt;DIR&gt;          .<br>2023/10/26  15:50    &lt;DIR&gt;          ..<br>2023/10/28  13:31            65,629 CentralControl.deps.json<br>2023/10/28  23:22         1,479,680 CentralControl.dll<br>2023/10/28  23:22           147,968 CentralControl.exe<br>2023/10/28  23:22            29,188 CentralControl.pdb<br>2023/10/26  15:50               266 CentralControl.runtimeconfig.json<br>2023/01/27  17:48           617,052 chrome_100_percent.pak<br>2023/01/27  17:48           922,095 chrome_200_percent.pak<br>2023/02/03  03:59         1,411,584 chrome_elf.dll<br>2023/02/02  23:10         4,891,080 d3dcompiler_47.dll<br>2023/10/26  15:50    &lt;DIR&gt;          fr<br>2023/01/27  13:21        10,462,432 icudtl.dat<br>2023/02/03  06:31       194,887,168 libcef.dll<br>2023/02/03  03:39           468,992 libEGL.dll<br>2023/02/03  03:38         7,467,008 libGLESv2.dll<br>2023/10/26  15:50    &lt;DIR&gt;          locales<br>2023/10/26  11:45    &lt;DIR&gt;          Logs<br>2022/10/19  00:19            45,200 Microsoft.Extensions.DependencyInjection.Abstractions.dll<br>2022/10/19  00:19            85,152 Microsoft.Extensions.DependencyInjection.dll<br>2022/10/19  00:19            64,120 Microsoft.Extensions.Logging.Abstractions.dll<br>2022/10/19  00:20            48,248 Microsoft.Extensions.Logging.dll<br>2022/10/19  00:19            61,560 Microsoft.Extensions.Options.dll<br>2022/10/19  00:19            42,624 Microsoft.Extensions.Primitives.dll<br>2022/11/16  09:34        20,821,952 Microsoft.Windows.SDK.NET.dll<br>2023/09/05  03:49            34,304 NAudio.Asio.dll<br>2023/09/05  03:49           187,904 NAudio.Core.dll<br>2023/09/05  03:49             7,680 NAudio.dll<br>2023/09/05  03:49            46,592 NAudio.Midi.dll<br>2023/09/05  03:49           179,200 NAudio.Wasapi.dll<br>2023/09/05  03:49            34,304 NAudio.WinForms.dll<br>2023/09/05  03:49            57,344 NAudio.WinMM.dll<br>2023/01/27  17:48         7,499,933 resources.pak<br>2023/10/26  11:45    &lt;DIR&gt;          runtimes<br>2023/01/19  20:55           170,496 SharpGen.Runtime.COM.dll<br>2023/01/19  20:54            76,800 SharpGen.Runtime.dll<br>2023/09/21  02:11           432,568 SkiaSharp.dll<br>2023/02/03  06:18           163,520 snapshot_blob.bin<br>2022/10/19  00:29           187,520 System.CodeDom.dll<br>2023/05/24  22:45            75,440 System.Management.dll<br>2022/10/19  00:19            71,312 System.Text.Encodings.Web.dll<br>2023/05/24  22:45           543,408 System.Text.Json.dll<br>2023/02/03  06:21           463,552 v8_context_snapshot.bin<br>2023/08/08  01:15           166,400 Vanara.Core.dll<br>2023/08/08  01:16            17,920 Vanara.PInvoke.DwmApi.dll<br>2023/08/08  01:16           123,392 Vanara.PInvoke.Gdi32.dll<br>2023/08/08  01:16           655,872 Vanara.PInvoke.Kernel32.dll<br>2023/08/08  01:15           604,160 Vanara.PInvoke.Shared.dll<br>2023/08/08  01:16             8,704 Vanara.PInvoke.SHCore.dll<br>2023/08/08  01:16           265,216 Vanara.PInvoke.User32.dll<br>2023/08/08  01:16            81,408 Vanara.PInvoke.UxTheme.dll<br>2023/02/03  03:32         4,945,920 vk_swiftshader.dll<br>2023/02/03  03:32               106 vk_swiftshader_icd.json<br>2023/03/04  01:11           517,120 Vortice.Direct2D1.dll<br>2023/03/04  01:10           346,624 Vortice.Direct3D11.dll<br>2023/03/04  01:11            63,488 Vortice.DirectComposition.dll<br>2023/03/04  01:08           268,288 Vortice.DirectX.dll<br>2023/03/04  01:10            92,672 Vortice.DXGI.dll<br>2023/02/21  19:12           110,080 Vortice.Mathematics.dll<br>2023/02/03  03:36           905,728 vulkan-1.dll<br>2023/10/10  23:19         2,104,832 WinFormium.dll<br>2022/11/16  09:34           395,664 WinRT.Runtime.dll<br>2023/10/26  15:50    &lt;DIR&gt;          zh-Hans<br>              56 个文件    265,924,469 字节<br>               7 个目录 25,875,599,360 可用字节<br><br>H:\S1\C#\CentralControl\bin\x64\Debug\net6.0-windows10.0.19041.0&gt;</pre>
+        <input id="input" type="text" autofocus>
+
+    </div>
+    <script>
+        const outputElement = document.getElementById('output');
+        const inputElement = document.getElementById('input');
+        const containerElement = document.getElementById('container');
+        inputElement.addEventListener('keyup', function (event) {
+
+            if (event.key === 'Enter') {
+                const inputText = inputElement.value;
+                inputElement.value = '';
+                const response = handleCommand(inputText);
+                outputElement.innerHTML += response;
+                // 滚动到底部
+                outputElement.scrollTop = outputElement.scrollHeight;
+                upInput();
+            }
+        });
+
+        function handleCommand(command) {
+            return `Command not recognized: ${command}`;
+        }
+        let textNode = document.createTextNode(" ");
+        function upInput() {
+            const lastTextNode = getLastTextNode(outputElement);
+            if (lastTextNode) {
+                lastTextNode.parentNode.appendChild(textNode);
+            } else {
+                outputElement.appendChild(textNode);
+            }
+            const range = document.createRange();
+            range.setStart(textNode, 0);
+            range.setEnd(textNode, 0);
+            const rect = range.getBoundingClientRect();
+
+            const containerRect = containerElement.getBoundingClientRect();
+
+            const x = rect.x - containerRect.x;
+            const y = rect.y - containerRect.y;
+
+            const width = containerRect.width - x - 40;
+
+            inputElement.style.width = `${width}px`;
+
+            textNode.remove();
+        }
+        function getLastTextNode(node) {
+            if (node.nodeType === Node.TEXT_NODE) {
+                return node;
+            }
+            const children = node.childNodes;
+            for (let i = children.length - 1; i >= 0; i--) {
+                const child = children[i];
+                const reslut = getLastTextNode(child);
+                if (reslut) {
+                    return reslut;
+                }
+            }
+            return null;
+        }
+    </script>
+</body>
+
+</html>

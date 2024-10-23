@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .container {
+            width: 600px;
+            height: 200px;
+            background-color: red;
+            margin: 0 auto;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <canvas id="cpuCanvas" style="width: 100%; height:100%;"></canvas>
+    </div>
+    <script>
+        class dataQueue {
+            constructor() {
+                this.data = [];
+            }
+            //添加数据到列队中
+            push(params) {
+                this.data.push(params);
+            }
+            //获取列队中的数据
+            get(index = 0) {
+                return this.data[index];
+            }
+
+            getAll() {
+                return this.data;
+            }
+            //获取最后一个元素
+            getLast() {
+                return this.data[this.data.length - 1];
+            }
+            //获取指定元素的位置
+            getIndex(item) {
+                return this.data.lastIndexOf(item);
+            }
+            //从列队中删除数据
+            dequeue() {
+                return this.data.shift();
+            }
+
+            //判断列队是否为空
+            isEmpty() {
+                return this.data.length === 0;
+            }
+            //列队长度
+            size() {
+                return this.data.length;
+            }
+            //清空列队
+            clear() {
+                this.data = [];
+            }
+            //打印列队
+            toString() {
+                return this.data.toString();
+            }
+        }
+    </script>
+    <script>
+        let queue = new dataQueue();
+        let canvas = document.getElementById("cpuCanvas");
+        canvas.width = canvas.clientWidth * devicePixelRatio;
+        canvas.height = canvas.clientHeight * devicePixelRatio;
+        let ctx = canvas.getContext("2d");
+        function drawLineChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.fillStyle = 'blue'
+
+            let value = queue.getAll();
+            for (let i = 0; i < value.length; i++) {
+                ctx.lineTo(ConvertIndexToX(value.length, value.length - 1 - i), PercentageToY(value[i]));
+                if (value.length - 1 - i == 0) {
+                    ctx.lineTo(canvas.clientWidth * devicePixelRatio, canvas.clientHeight * devicePixelRatio);
+                    ctx.lineTo(ConvertIndexToX(value.length, i + 1), canvas.clientHeight * devicePixelRatio);
+                    ctx.fill();
+                }
+            }
+            ctx.stroke();
+        }
+        // 将一个百分比转化为y
+        function PercentageToY(percentage) {
+            const canvasHeight = canvas.clientHeight;
+            const y = (canvasHeight - ((canvasHeight / 100) * percentage)) * devicePixelRatio;
+            return y;
+        }
+        //将数据索引位置转化为X值
+        function ConvertIndexToX(accuracy, index) {
+            const canvasWidth = canvas.clientWidth;
+            let x = ((canvasWidth / accuracy) * index) * devicePixelRatio;
+            //反转X轴
+            x = canvasWidth * devicePixelRatio - x;
+            return x;
+        }
+        //监听窗体大小改变事件
+        window.onresize = function () {
+            canvas.width = canvas.clientWidth * devicePixelRatio;
+            canvas.height = canvas.clientHeight * devicePixelRatio;
+            drawLineChart();
+        }
+        function pushData(data, accuracy) {
+            if (queue.size() == accuracy) {
+                queue.dequeue();
+            }
+            queue.push(data);
+            drawLineChart();
+        }
+        //用于模拟数据
+        function analogData(time = 2000) {
+            let interval = setInterval(() => {
+                pushData(Math.floor(Math.random() * 100), 60);
+            }, 1000/10);
+            setTimeout(() => {
+                interval = clearInterval(interval);
+            }, time);
+        }
+    </script>
+    
+</body>
+
+</html>

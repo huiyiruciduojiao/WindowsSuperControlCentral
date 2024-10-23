@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .CL {
+            height: 200px;
+            width: 600px;
+            border: 1px solid;
+            display: flex;
+        }
+
+        .CLR {
+            height: 200px;
+            width: 200px;
+            border: 1px solid red;
+            flex: 1
+        }
+
+        .CLL {
+            position: relative;
+        }
+        .CLL::-webkit-scrollbar{
+            width: 100px;
+            height: inherit;
+        }
+        .CLL-content {
+            margin: 0;
+            height: 200px;
+            position: absolute;
+            top: 0;
+            right: 5px;
+            bottom: 0;
+            left: 0;
+            border: 1px solid;
+        }
+
+        .resizable {
+            resize: horizontal;
+            cursor: ew-resize;
+            
+            width: 200px;
+            height: 200px;
+            overflow: scroll;
+            border: 1px solid black;
+            opacity: 0;
+        }
+
+        .resizable::-webkit-scrollbar {
+            width: 20px;
+            height: inherit;
+        }
+
+        /* 拖拽线 */
+        .resize-line {
+            position: absolute;
+            right: 0;
+            top: 0;
+            bottom: 0;
+            border-right: 2px solid #eee;
+            border-left: 1px solid #bbb;
+            pointer-events: none;
+        }
+
+        .resizable:hover~.resize-line,
+        .resizable:active~.resize-line {
+            border-left: 1px dashed skyblue;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="CL">
+        <div class="CLL">
+            <div class="resizable"></div>
+            <p class="CLL-content">
+                改变左边的宽度
+            </p>
+        </div>
+        <div class="CLR"></div>
+    </div>
+</body>
+
+</html>

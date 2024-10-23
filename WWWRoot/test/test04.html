@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>数据列对测试</title>
+    <script src="../js/dataQueue.js"></script>
+</head>
+
+<body>
+    <div>
+        <canvas id="canvas" style="width: 600px;height: 200px ;background-color: red;"></canvas>
+
+    </div>
+
+
+    <script>
+        const queue = new dataQueue();
+        setInterval(() => {
+            drawLineChart();
+        }, 1000 / 60);
+        setInterval(() => {
+            if (queue.size() > 60) {
+                queue.dequeue();
+            }
+            queue.push(Math.round(Math.random() * 100));
+        }, 1000/6);
+
+        // setInterval(() => {
+        //     console.log(queue.toString());
+        //     console.log(queue.getLast());
+        // }, 1000);
+        const canvas = document.getElementById("canvas");
+        canvas.width = canvas.clientWidth * devicePixelRatio;
+        canvas.height = canvas.clientHeight * devicePixelRatio;
+        const ctx = canvas.getContext("2d");
+        function drawLineChart() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.beginPath();
+            ctx.fillStyle = 'blue'
+
+            let value = queue.getAll();
+            for (let i = 0; i < value.length; i++) {
+                console.log(PercentageToY(value[i]));
+                ctx.lineTo(ConvertIndexToX(value.length, value.length - 1 - i), PercentageToY(value[i]));
+                if (value.length - 1 - i == 0){
+                    ctx.lineTo(canvas.clientWidth*devicePixelRatio, canvas.clientHeight*devicePixelRatio);
+                    ctx.lineTo(ConvertIndexToX(value.length, i),canvas.clientHeight*devicePixelRatio);
+                    ctx.fill();
+                }
+            }
+            ctx.stroke();
+        }
+        // 将一个百分比转化为y
+        function PercentageToY(percentage) {
+            const canvasHeight = canvas.clientHeight;
+            const y = (canvasHeight - ((canvasHeight / 100) * percentage)) * devicePixelRatio;
+            return y;
+        }
+        //将数据索引位置转化为X值
+        function ConvertIndexToX(accuracy, index) {
+            const canvasWidth = canvas.clientWidth;
+            let x = ((canvasWidth / accuracy) * index) * devicePixelRatio;
+            //反转X轴
+            x = canvasWidth * devicePixelRatio - x;
+            return x;
+        }
+        //监听窗体大小改变事件
+        window.onresize = function () {
+            canvas.width = canvas.clientWidth * devicePixelRatio;
+            canvas.height = canvas.clientHeight * devicePixelRatio;
+        }
+    </script>
+</body>
+
+</html>

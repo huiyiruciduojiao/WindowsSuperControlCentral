@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas id="myCanvas" width="800" height="400"></canvas>
+    <script>
+        const canvas = document.getElementById('myCanvas');
+        const ctx = canvas.getContext('2d');
+        // 绘制坐标轴
+        ctx.beginPath();
+        ctx.moveTo(50, 50);
+        ctx.lineTo(50, 350);
+        ctx.lineTo(750, 350);
+        ctx.stroke();
+
+        // 绘制数据点
+        const data = [
+            { x: 100, y: 300 },
+            { x: 200, y: 100 },
+            { x: 300, y: 250 },
+            // 添加更多数据点
+        ];
+
+        ctx.beginPath();
+        ctx.moveTo(50, 350);
+        data.forEach(point => {
+            ctx.lineTo(point.x, point.y);
+            ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI); // 添加数据点的圆形标记
+        });
+        ctx.stroke();
+        function animate() {
+            // 更新数据点或图表内容
+
+            // 清除Canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 重新绘制图表
+            // 绘制坐标轴
+
+            ctx.beginPath();
+            ctx.moveTo(50, 50);
+            ctx.lineTo(50, 350);
+            ctx.lineTo(750, 350);
+            ctx.stroke();
+
+            // 绘制数据点
+            ctx.beginPath();
+            ctx.moveTo(50, 350);
+            data.forEach(point => {
+                ctx.lineTo(point.x, point.y);
+                ctx.arc(point.x, point.y, 5, 0, 2 * Math.PI);
+            });
+            ctx.stroke();
+
+            requestAnimationFrame(animate); // 递归调用以创建动画效果
+        }
+
+        animate(); // 启动动画
+
+    </script>
+</body>
+
+</html>

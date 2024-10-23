@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="zh-cn">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>任务列表测试</title>
+    <style>
+        #taskList {
+            width: 500px;
+            height: 300px;
+            margin: auto;
+            margin-top: 300px;
+            overflow-y: auto;
+        }
+
+        #taskul {
+            padding: 0px;
+        }
+
+        li {
+            margin: 0px;
+            padding: 0px;
+            list-style: none;
+            /* border: 1px solid; */
+            line-height: 30px;
+
+        }
+
+
+        li:hover {
+            background-color: #E0F5FF;
+            color: black;
+            cursor: pointer;
+        }
+
+        .liSelect {
+            background-color: #C3EBFF;
+        }
+
+        #menus {
+            width: 140px;
+            padding: 3px 5px;
+            background-color: #ffffff;
+            display: none;
+            /* display: flex; */
+            flex-wrap: wrap;
+            border: 1px solid #dadce0;
+            border-radius: 2px;
+            box-shadow: 1px 1px 2px #878787;
+            position: fixed;
+            user-select: none;
+        }
+
+        #menus div {
+            display: flex;
+            align-items: center;
+            margin: 2px 0px;
+            cursor: pointer;
+            width: 100%;
+            min-height: 26px;
+            padding: 0px 8px;
+            font-size: 14px;
+        }
+
+        #menus div:hover {
+            background-color: #e8e8e9;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="taskList">
+        <ul id="taskul">
+            <li>Lorem.</li>
+            <li>Obcaecati.</li>
+            <li>Pariatur.</li>
+            <li>Laboriosam!</li>
+            <li>Fugit!</li>
+            <li>Dolor!</li>
+            <li>Iste.</li>
+            <li>Ducimus.</li>
+            <li>Nisi!</li>
+            <li>Sapiente!</li>
+            <li>Autem.</li>
+            <li>Recusandae?</li>
+            <li>Soluta.</li>
+            <li>Rem.</li>
+            <li>Rerum.</li>
+        </ul>
+    </div>
+    <div id="menus">
+        <div data-id="killTask">结束任务</div>
+        <div data-id="attribute">属性</div>
+    </div>
+    <script>
+        var elementUl = document.getElementById("taskul");
+        function updata() {
+            elementUl.innerHTML = "";
+            var temp = document.createDocumentFragment();
+            for (var i = 0; i < Math.round(Math.random(10) * 150); i++) {
+                var templi = document.createElement("li");
+                templi.innerText = i;
+                temp.append(templi);
+            }
+            elementUl.append(temp);
+        }
+        // setInterval(() => {
+        //     updata();
+        // }, 1000);
+
+    </script>
+    <script>
+        const menus = document.getElementById("menus");
+        let selectElement = null;
+        elementUl.addEventListener("contextmenu", (e) => {
+            e.preventDefault();
+            if (selectElement != null) {
+                selectElement.classList.remove("liSelect");
+            }
+            selectElement = e.target;
+            selectElement.classList.add("liSelect");
+            showMenu(e);
+        });
+        document.addEventListener("click", hideMenu, false); // 隐藏菜单
+        function showMenu(e) {
+            menus.style.top = `${e.clientY}px`;
+            menus.style.left = `${e.clientX}px`;
+            menus.style.display = "flex";
+        }
+        function hideMenu() {
+            selectElement.classList.remove("liSelect");
+            menus.style.display = "none";
+        }
+        const menusChild = document.querySelectorAll("#menus div");
+        menusChild.forEach(item => {
+            item.onclick = (e) => {
+                console.log(e.target.dataset.id, '元素');
+                hideMenu()
+            }
+        });
+    </script>
+</body>
+
+</html>

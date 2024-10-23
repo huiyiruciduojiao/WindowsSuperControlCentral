@@ -1,0 +1,113 @@
+<!--
+	此示例下载自 https://echarts.apache.org/examples/zh/editor.html?c=dynamic-data2&theme=dark&code=GYVwdgxgLglg9mABAJwIZgCZwLYBFVSoAUAlIgN4BQiiYcA7ogLy0Cmj-UrRA1HYz0QJW-AJ4kA3NUQA3VABsQrZrIVLEggLIEAFgDo0mHKUQAqRACYAjIgC0iKwAYpNZKyghkSKjRphU2KwAXLQMelBwAMpQyDBgAOakADTSNHKKwYgA2qm-Wfx68e4AYiDy8gCarKjIyaH0he6aCFA6JoJWSfWNUJzcJAC6egBWcHFEAOQA9BMkKb6-2q0GcOAYROlKJLkD0gC-UnuU8u6IGASoKlkDUidQ9Spg7Ih9RFYAnO8A7F3vXQDMkmOp2EYhUFgALGZEP8AGyORzQpwI26nTbKFhLfSGLDYEzmZHOSjAODIRAbGqIGAqZxUxAAHgcCNpMB4PDIPjOFz0AAcQABnNo4nCcYgkIFHOA82AIFSc2BQE4hTk0LgADygIQmuFE_mwMAgLwuiAAZIgACowQKIACCapg_Im-3miAicHksB5ytyMRg8SKyC1qHtjpdNBJyGwBC4gcQoEgMqQRB5NQC_I5uRoKbQ2H5KmzaayjhumdUZPOXEez1eBdzej1rCBC1c7k8SdLNArrB6rzIPA7iGmEw0A6IXZ6zTArXaDj7A6HI-bvnHRSgpXKVRq7XniC1i6XiFr_L06KyVl2S6bvj2YcQwYdAAUxlPWLGVb50FaCPAwCFgAp-VYXIjhoG9pDVO0HW9BYoFEHlMgmWBAgmW9-R5eQYCgAAZOJMnfGhBQYP8AKAhYQMQMCaFESD-Wg3xYPgrV0RQ3IACNVkwGpRAAcVQL1skcLoJmRABSCYBlQ9DMJwp46IWQj6GI-RAOA51pEA2JWFo7Jcnw2gAgQ4pUAAa2UUUWKXBiEIwp4LObBTIlEbB2PkJTANvTsLhCCtUFUmhdgOShAKgABJF9kHSIh42gH9yQzcNSXJOQyWpFgWQZJkWTZeLl25QUYGAKBSBcXLCF5AUhXQXFRVIK9yOwUQAGEdBqKA9GCgB5aUfyId8NJgLSQhyJc9M8whvIuUtyP8_YJS6QlJCAA
+	⚠ 请注意，该图表不是 Apache ECharts 官方示例，而是由用户代码生成的。请注意鉴别其内容。
+-->
+<!DOCTYPE html>
+<html lang="zh-CN" style="height: 100%">
+
+<head>
+  <meta charset="utf-8">
+</head>
+
+<body style="height: 100%; margin: 0">
+  <div id="container" style="height: 100%"></div>
+
+
+  <script type="text/javascript" src="../js/echarts.min.js"></script>
+
+  <script type="text/javascript">
+    var dom = document.getElementById('container');
+    var myChart = echarts.init(dom, 'dark', {
+      renderer: 'canvas',
+      useDirtyRect: false
+    });
+    var app = {};
+
+    var option;
+
+    function randomData() {
+      value = Math.random() * 100;
+      return {
+        name: Date.now().toString(),
+        value: [
+          Date.now(),
+          Math.round(value)
+        ]
+      };
+    }
+    let data = [];
+    let now = new Date();
+    let value = 100;
+    for (var i = 0; i <60; i++) {
+      data.push(randomData());
+    }
+    option = {
+      title: {
+        text: 'Dynamic Data & Time Axis'
+      },
+      tooltip: {
+        trigger: 'axis',
+        formatter: function (params) {
+          params = params[0];
+          console.log(params.name);
+          var date = new Date(parseInt(params.name));
+          return (
+            date.getHours() +
+            ':' +
+            (date.getMinutes() + 1) +
+            ':' +
+            date.getSeconds() +
+            ' : ' +
+            params.value[1]
+          );
+        },
+        axisPointer: {
+          animation: false
+        }
+      },
+      xAxis: {
+        type: 'time',
+        splitLine: {
+          show: false
+        }
+      },
+      yAxis: {
+        type: 'value',
+        boundaryGap: [0, '100%'],
+        splitLine: {
+          show: false
+        },
+        
+      },
+      series: [
+        {
+          name: 'Fake Data',
+          type: 'line',
+          showSymbol: false,
+          data: data
+        }
+      ]
+    };
+
+    setInterval(function () {
+      for (var i = 0; i < 1; i++) {
+        data.shift();
+         data.push(randomData());
+      }
+      myChart.setOption({
+        series: [
+          {
+            data: data
+          }
+        ]
+      });
+    }, 1000 );
+    if (option && typeof option === 'object') {
+      myChart.setOption(option);
+    }
+
+    window.addEventListener('resize', myChart.resize);
+  </script>
+</body>
+
+</html>
